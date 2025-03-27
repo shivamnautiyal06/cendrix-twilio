@@ -21,23 +21,23 @@ Enter your Twilio account `SID` and `AuthToken` to get started. The `Messages` t
 
 ## Screenshots
 
-Login in
-<img src='src/assets/img1.png' width='75%' style="border: 1px solid;">
+Login in  
+<img src='src/assets/img1.png' width='75%'>
 
-Messages
-<img src='src/assets/img2.png' width='75%' style="border: 1px solid;">
+Messages  
+<img src='src/assets/img2.png' width='75%'>
 
-Mobile
-<img src='src/assets/img3.png' width='30%' style="border: 1px solid;">
+Mobile  
+<img src='src/assets/img3.png' width='30%'>
 
 ## Development
 
 ```
-$ npm install
+$ pnpm install
 
 # Access dev version on http://localhost:5173
-$ npm run dev
+$ pnpm run dev
 
 # Build production dist/
-$ npm run build
+$ pnpm run build
 ```
