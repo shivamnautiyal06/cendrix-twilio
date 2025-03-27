@@ -1,0 +1,62 @@
+import * as React from "react";
+import Box from "@mui/joy/Box";
+import Button from "@mui/joy/Button";
+import FormControl from "@mui/joy/FormControl";
+import Textarea from "@mui/joy/Textarea";
+import { Stack } from "@mui/joy";
+import SendRoundedIcon from "@mui/icons-material/SendRounded";
+
+export type MessageInputProps = {
+  onSubmit: (content: string) => Promise<void>;
+};
+
+export default function MessageInput(props: MessageInputProps) {
+  const [textAreaValue, setTextAreaValue] = React.useState("");
+  const { onSubmit } = props;
+  const textAreaRef = React.useRef<HTMLDivElement>(null);
+  const handleClick = () => {
+    if (textAreaValue.trim() !== "") {
+      try {
+        onSubmit(textAreaValue);
+      } catch (err) {
+        console.error("Failed to send message:", err);
+      }
+      setTextAreaValue("");
+    }
+  };
+  return (
+    <Box sx={{ px: 2, pb: 3, pt: 3 }}>
+      <FormControl>
+        <Stack spacing={1} direction="row">
+          <Textarea
+            sx={{
+              flexGrow: 1,
+            }}
+            placeholder="Enter your message..."
+            aria-label="Message"
+            ref={textAreaRef}
+            onChange={(event) => {
+              setTextAreaValue(event.target.value);
+            }}
+            value={textAreaValue}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && (event.metaKey || event.ctrlKey)) {
+                handleClick();
+              }
+            }}
+          />
+          <Button
+            size="sm"
+            color="primary"
+            sx={{ alignSelf: "center", borderRadius: "sm" }}
+            endDecorator={<SendRoundedIcon />}
+            onClick={handleClick}
+            disabled={!textAreaValue.trim()}
+          >
+            Send
+          </Button>
+        </Stack>
+      </FormControl>
+    </Box>
+  );
+}
