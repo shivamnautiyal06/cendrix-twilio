@@ -27,11 +27,17 @@ export default function TwilioForm() {
     }
   }, []);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setCredentials(sid, authToken);
-    localStorage.setItem("sid", sid);
-    localStorage.setItem("authToken", authToken);
+    try {
+      const credsValid = await setCredentials(sid, authToken);
+      if (credsValid) {
+        localStorage.setItem("sid", sid);
+        localStorage.setItem("authToken", authToken);
+      }
+    } catch (err) {
+
+    }
   };
 
   return (
@@ -80,6 +86,11 @@ export default function TwilioForm() {
       {isAuthenticated && (
         <Alert variant="soft" color="success" sx={{ mt: 2, width: "100%" }}>
           Credentials successfully set!
+        </Alert>
+      )}
+      {(!isAuthenticated && (sidContext || authTokenContext)) && (
+        <Alert variant="soft" color="danger" sx={{ mt: 2, width: "100%" }}>
+          Credentials incorrect!
         </Alert>
       )}
     </Box>

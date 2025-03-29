@@ -5,7 +5,7 @@ interface CredentialsContextType {
   sid: string;
   authToken: string;
   apiClient: ApiClient | null;
-  setCredentials: (sid: string, authToken: string) => void;
+  setCredentials: (sid: string, authToken: string) => Promise<boolean>;
   isAuthenticated: boolean;
   activePhoneNumber: string;
   phoneNumbers: string[];
@@ -16,7 +16,7 @@ const CredentialsContext = createContext<CredentialsContextType>({
   sid: "",
   authToken: "",
   apiClient: null,
-  setCredentials: () => {},
+  setCredentials: async () => true,
   isAuthenticated: false,
   activePhoneNumber: "",
   phoneNumbers: [],
@@ -33,22 +33,30 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   const [apiClient, setApiClient] = useState<ApiClient | null>(null);
   const [activePhoneNumber, setActivePhoneNumber] = useState<string>("");
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const setCredentials = async (sid: string, authToken: string) => {
-    setSid(sid);
-    setAuthToken(authToken);
     const client = new ApiClient(sid, authToken);
-    setApiClient(client);
-    const phoneNumbers = await client.getPhoneNumbers();
-    setPhoneNumbers(phoneNumbers);
-    setActivePhoneNumber(phoneNumbers[0]);
+    try {
+      setSid(sid);
+      setAuthToken(authToken);
+      await client.getPhoneNumbers();
+      setApiClient(client);
+      const phoneNumbers = await client.getPhoneNumbers();
+      setPhoneNumbers(phoneNumbers);
+      setActivePhoneNumber(phoneNumbers[0]);
+      setIsAuthenticated(true);
+    } catch (err) {
+      setIsAuthenticated(false);
+      return false;
+    }
+
+    return true;
   };
 
   const setActivePhoneNumberContext = (phoneNumber: string) => {
     setActivePhoneNumber(phoneNumber);
   };
-
-  const isAuthenticated = !!(sid && authToken);
 
   return (
     <CredentialsContext.Provider
