@@ -13,6 +13,7 @@ export default function TwilioForm() {
     isAuthenticated,
     sid: sidContext,
     authToken: authTokenContext,
+    isLoading,
   } = useCredentials();
   const [sid, setSid] = React.useState(
     () => localStorage.getItem("sid") || sidContext,
@@ -35,9 +36,7 @@ export default function TwilioForm() {
         localStorage.setItem("sid", sid);
         localStorage.setItem("authToken", authToken);
       }
-    } catch (err) {
-
-    }
+    } catch (err) {}
   };
 
   return (
@@ -83,12 +82,12 @@ export default function TwilioForm() {
       <Button type="submit" variant="solid" sx={{ width: "100%" }}>
         Submit
       </Button>
-      {isAuthenticated && (
+      {isAuthenticated && !isLoading && (
         <Alert variant="soft" color="success" sx={{ mt: 2, width: "100%" }}>
           Credentials successfully set!
         </Alert>
       )}
-      {(!isAuthenticated && (sidContext || authTokenContext)) && (
+      {!isAuthenticated && !isLoading && (sidContext || authTokenContext) && (
         <Alert variant="soft" color="danger" sx={{ mt: 2, width: "100%" }}>
           Credentials incorrect!
         </Alert>

@@ -10,6 +10,7 @@ interface CredentialsContextType {
   activePhoneNumber: string;
   phoneNumbers: string[];
   setActivePhoneNumberContext: (phoneNumbers: string) => void;
+  isLoading: boolean;
 }
 
 const CredentialsContext = createContext<CredentialsContextType>({
@@ -21,6 +22,7 @@ const CredentialsContext = createContext<CredentialsContextType>({
   activePhoneNumber: "",
   phoneNumbers: [],
   setActivePhoneNumberContext: () => {},
+  isLoading: false,
 });
 
 export const useCredentials = () => useContext(CredentialsContext);
@@ -28,14 +30,17 @@ export const useCredentials = () => useContext(CredentialsContext);
 export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [sid, setSid] = useState<string>("");
-  const [authToken, setAuthToken] = useState<string>("");
+  const [sid, setSid] = useState("");
+  const [authToken, setAuthToken] = useState("");
   const [apiClient, setApiClient] = useState<ApiClient | null>(null);
-  const [activePhoneNumber, setActivePhoneNumber] = useState<string>("");
+  const [activePhoneNumber, setActivePhoneNumber] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const setCredentials = async (sid: string, authToken: string) => {
+    setIsLoading(true);
+    let success = true;
     const client = new ApiClient(sid, authToken);
     try {
       setSid(sid);
@@ -48,10 +53,11 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
       setIsAuthenticated(true);
     } catch (err) {
       setIsAuthenticated(false);
-      return false;
+      success = false;
     }
 
-    return true;
+    setIsLoading(false);
+    return success;
   };
 
   const setActivePhoneNumberContext = (phoneNumber: string) => {
@@ -69,6 +75,7 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
         activePhoneNumber,
         phoneNumbers,
         setActivePhoneNumberContext,
+        isLoading,
       }}
     >
       {children}
