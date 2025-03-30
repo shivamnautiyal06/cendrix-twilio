@@ -55,6 +55,7 @@ class TwilioClient {
             params: {
                 From: props.from,
                 To: props.to,
+                PageSize: 1000,
             },
         });
         return res.data.messages.map(transform);
