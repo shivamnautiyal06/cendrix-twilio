@@ -1,8 +1,6 @@
-import Avatar from "@mui/joy/Avatar";
-import IconButton from "@mui/joy/IconButton";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { Avatar, IconButton, Stack, Typography } from "@mui/joy";
+import { ArrowBackIosNewRounded } from "@mui/icons-material";
+
 import { toggleMessagesPane } from "../../utils";
 
 type MessagesPaneHeaderProps = {
@@ -35,7 +33,7 @@ export default function MessagesPaneHeader(props: MessagesPaneHeaderProps) {
           sx={{ display: { xs: "inline-flex", sm: "none" } }}
           onClick={() => toggleMessagesPane()}
         >
-          <ArrowBackIosNewRoundedIcon />
+          <ArrowBackIosNewRounded />
         </IconButton>
         <Avatar size="lg" />
         <div>

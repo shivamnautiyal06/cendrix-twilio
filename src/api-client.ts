@@ -1,9 +1,9 @@
-import type { PlainMessage } from "../../server/messages/messages.models";
 import { MessagesService } from "./services/messages.service";
 import { ContactsService } from "./services/contacts.service";
 import { PhoneNumbersService } from "./services/phone-numbers.service";
 import TwilioClient from "./services/twilio-client";
-import type { ChatInfo } from "./types";
+
+import type { ChatInfo, PlainMessage } from "./types";
 
 class ApiClient {
     private axiosInstance: TwilioClient;

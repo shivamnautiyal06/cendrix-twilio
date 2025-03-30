@@ -1,8 +1,7 @@
 import * as React from "react";
-import Box from "@mui/joy/Box";
-import Sheet from "@mui/joy/Sheet";
-import MessageInput from "./MessageInput";
+import { Box, Sheet } from "@mui/joy";
 
+import MessageInput from "./MessageInput";
 import { useCredentials } from "../../context/CredentialsContext";
 import NewMessagePaneHeader from "./NewMessagePaneHeader";
 

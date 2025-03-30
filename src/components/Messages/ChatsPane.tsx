@@ -1,15 +1,24 @@
-import Stack from "@mui/joy/Stack";
-import Sheet from "@mui/joy/Sheet";
-import Typography from "@mui/joy/Typography";
-import { IconButton, Input, Select, Option } from "@mui/joy";
-import List from "@mui/joy/List";
-import EditNoteRoundedIcon from "@mui/icons-material/EditNoteRounded";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { useState } from "react";
+import {
+  IconButton,
+  Input,
+  Select,
+  Option,
+  Stack,
+  Sheet,
+  Typography,
+  List,
+} from "@mui/joy";
+import {
+  EditNoteRounded,
+  SearchRounded,
+  CloseRounded,
+} from "@mui/icons-material";
+
 import ChatListItem from "./ChatListItem";
 import { toggleMessagesPane } from "../../utils";
 import { useCredentials } from "../../context/CredentialsContext";
-import { useState } from "react";
+
 import type { ChatInfo } from "../../types";
 
 type ChatsPaneProps = {
@@ -23,7 +32,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
   const { chats, setSelectedChat, selectedChatId, activePhoneNumber } = props;
   const { phoneNumbers, setActivePhoneNumberContext } = useCredentials();
   const [contactsFilter, setContactsFilter] = useState("");
-  
+
   return (
     <Sheet
       sx={{
@@ -49,7 +58,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
             fontSize: { xs: "md", md: "lg" },
             fontWeight: "lg",
             mr: "auto",
-            display: { xs: "none", sm: "unset" }
+            display: { xs: "none", sm: "unset" },
           }}
         >
           Messages
@@ -60,12 +69,13 @@ export default function ChatsPane(props: ChatsPaneProps) {
           color="neutral"
           onClick={() => {
             setSelectedChat(null);
-            if (window.innerWidth < 600) { // Approximate `xs` breakpoint
+            if (window.innerWidth < 600) {
+              // Approximate `xs` breakpoint
               toggleMessagesPane();
             }
           }}
         >
-          <EditNoteRoundedIcon />
+          <EditNoteRounded />
         </IconButton>
         <IconButton
           variant="plain"
@@ -77,7 +87,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
           }}
           sx={{ display: { sm: "none" } }}
         >
-          <CloseRoundedIcon />
+          <CloseRounded />
         </IconButton>
       </Stack>
       <Stack sx={{ px: 2, pb: 1.5 }} spacing={1}>
@@ -100,11 +110,11 @@ export default function ChatsPane(props: ChatsPaneProps) {
             setContactsFilter(event.target.value);
           }}
           value={contactsFilter}
-          startDecorator={<SearchRoundedIcon />}
+          startDecorator={<SearchRounded />}
           placeholder="Filter contacts"
           endDecorator={
             <IconButton size="sm" onClick={() => setContactsFilter("")}>
-              <CloseRoundedIcon />
+              <CloseRounded />
             </IconButton>
           }
         />

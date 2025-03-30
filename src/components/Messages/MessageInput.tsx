@@ -1,10 +1,6 @@
 import * as React from "react";
-import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import FormControl from "@mui/joy/FormControl";
-import Textarea from "@mui/joy/Textarea";
-import { Stack } from "@mui/joy";
-import SendRoundedIcon from "@mui/icons-material/SendRounded";
+import { Box, Button, FormControl, Textarea, Stack } from "@mui/joy";
+import { SendRounded } from "@mui/icons-material";
 
 export type MessageInputProps = {
   onSubmit: (content: string) => Promise<void>;
@@ -49,7 +45,7 @@ export default function MessageInput(props: MessageInputProps) {
             size="sm"
             color="primary"
             sx={{ alignSelf: "center", borderRadius: "sm" }}
-            endDecorator={<SendRoundedIcon />}
+            endDecorator={<SendRounded />}
             onClick={handleClick}
             disabled={!textAreaValue.trim()}
           >

@@ -1,12 +1,8 @@
 import * as React from "react";
-import IconButton from "@mui/joy/IconButton";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
-import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { IconButton, Stack, Typography, Input, Divider } from "@mui/joy";
+import { ArrowBackIosNewRounded } from "@mui/icons-material";
 
 import { toggleMessagesPane } from "../../utils";
-import Input from "@mui/joy/Input";
-import { Divider } from "@mui/joy";
 
 type MessagesPaneHeaderProps = {
   setContactNumber: (contactNumber: string) => void;
@@ -38,7 +34,7 @@ export default function NewMessagePaneHeader(props: MessagesPaneHeaderProps) {
           sx={{ display: { xs: "inline-flex", sm: "none" } }}
           onClick={() => toggleMessagesPane()}
         >
-          <ArrowBackIosNewRoundedIcon />
+          <ArrowBackIosNewRounded />
         </IconButton>
         <Input
           placeholder="+12223334444"

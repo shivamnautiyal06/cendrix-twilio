@@ -1,5 +1,5 @@
 import * as React from "react";
-import Sheet from "@mui/joy/Sheet";
+import { Sheet } from "@mui/joy";
 
 import MessagesPane from "./MessagesPane";
 import ChatsPane from "./ChatsPane";

@@ -1,17 +1,19 @@
-import { Link } from "react-router-dom"; // Ensure you have react-router-dom installed
+import { Link } from "react-router-dom";
 import { useLocation } from "react-router-dom";
-import GlobalStyles from "@mui/joy/GlobalStyles";
-import Avatar from "@mui/joy/Avatar";
-import Box from "@mui/joy/Box";
-import IconButton from "@mui/joy/IconButton";
-import List from "@mui/joy/List";
-import ListItem from "@mui/joy/ListItem";
-import ListItemButton, { listItemButtonClasses } from "@mui/joy/ListItemButton";
-import ListItemContent from "@mui/joy/ListItemContent";
-import Typography from "@mui/joy/Typography";
-import Sheet from "@mui/joy/Sheet";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import QuestionAnswerRoundedIcon from "@mui/icons-material/QuestionAnswerRounded";
+import {
+  GlobalStyles,
+  Avatar,
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemButton,
+  listItemButtonClasses,
+  ListItemContent,
+  Typography,
+  Sheet,
+} from "@mui/joy";
+import { HomeRounded, QuestionAnswerRounded } from "@mui/icons-material";
 
 import logo from "../assets/logo.png"; // Import the logo
 import { useCredentials } from "../context/CredentialsContext";
@@ -107,7 +109,7 @@ export default function Sidebar() {
               to="/"
               selected={location.pathname === "/"}
             >
-              <HomeRoundedIcon />
+              <HomeRounded />
               <ListItemContent>
                 <Typography level="title-sm">Credentials</Typography>
               </ListItemContent>
@@ -121,7 +123,7 @@ export default function Sidebar() {
               to="/messages"
               selected={location.pathname === "/messages"}
             >
-              <QuestionAnswerRoundedIcon />
+              <QuestionAnswerRounded />
               <ListItemContent>
                 <Typography level="title-sm">Messages</Typography>
               </ListItemContent>

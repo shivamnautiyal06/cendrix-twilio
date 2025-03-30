@@ -1,13 +1,18 @@
 import * as React from "react";
-import Box from "@mui/joy/Box";
-import ListDivider from "@mui/joy/ListDivider";
-import ListItem from "@mui/joy/ListItem";
-import ListItemButton, { ListItemButtonProps } from "@mui/joy/ListItemButton";
-import Stack from "@mui/joy/Stack";
-import Typography from "@mui/joy/Typography";
-import CircleIcon from "@mui/icons-material/Circle";
+import {
+  Box,
+  ListDivider,
+  ListItem,
+  ListItemButton,
+  ListItemButtonProps,
+  Stack,
+  Typography,
+  Avatar,
+} from "@mui/joy";
+import { Circle } from "@mui/icons-material";
+
 import { displayDateTime, toggleMessagesPane } from "../../utils";
-import { Avatar } from "@mui/joy";
+
 import type { ChatInfo } from "../../types";
 
 type ChatListItemProps = ListItemButtonProps & {
@@ -40,7 +45,7 @@ export default function ChatListItem(props: ChatListItemProps) {
             </Box>
             <Box sx={{ lineHeight: 1.5, textAlign: "right" }}>
               {chat.hasUnread && (
-                <CircleIcon sx={{ fontSize: 12 }} color="primary" />
+                <Circle sx={{ fontSize: 12 }} color="primary" />
               )}
               <Typography
                 level="body-xs"

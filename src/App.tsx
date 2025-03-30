@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { CssVarsProvider } from "@mui/joy/styles";
-import CssBaseline from "@mui/joy/CssBaseline";
-import Box from "@mui/joy/Box";
+import { CssBaseline, Box } from "@mui/joy";
 
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Messages/Header";

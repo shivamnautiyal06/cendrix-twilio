@@ -1,7 +1,4 @@
-import Box from "@mui/joy/Box";
-import Sheet from "@mui/joy/Sheet";
-import Stack from "@mui/joy/Stack";
-import { Avatar } from "@mui/joy";
+import { Box, Sheet, Stack, Avatar } from "@mui/joy";
 
 import ChatBubble from "./ChatBubble";
 import MessageInput from "./MessageInput";

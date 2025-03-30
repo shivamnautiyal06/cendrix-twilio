@@ -1,6 +1,7 @@
-import type { ChatInfo, TwilioMsg } from "../types.ts";
 import { LOCAL_STORAGE_UNREAD_KEY, makeChatId } from "../utils.ts";
 import TwilioClient from "./twilio-client.ts";
+
+import type { ChatInfo, TwilioMsg } from "../types.ts";
 
 export class ContactsService {
     private client: TwilioClient;
