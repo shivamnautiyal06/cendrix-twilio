@@ -5,7 +5,7 @@ import MessagesPane from "./MessagesPane";
 import ChatsPane from "./ChatsPane";
 import NewMessagesPane from "./NewMessagePane";
 import { useCredentials } from "../../context/CredentialsContext";
-import { usePollingChats } from "../../usePollingChats";
+import { usePollingChats } from "../../hooks/usePollingChats";
 
 export default function Messages() {
   const { isAuthenticated, apiClient, activePhoneNumber, setCredentials } =

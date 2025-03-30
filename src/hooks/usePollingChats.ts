@@ -1,7 +1,7 @@
 import React from "react";
-import type { ChatInfo } from "./types";
-import { useCredentials } from "./context/CredentialsContext";
-import { POLL_INTERVAL } from "./utils";
+import type { ChatInfo } from "../types";
+import { useCredentials } from "../context/CredentialsContext";
+import { POLL_INTERVAL } from "../utils";
 
 export function usePollingChats(pollInterval = POLL_INTERVAL) {
     const [chats, setChats] = React.useState<ChatInfo[]>([]);
