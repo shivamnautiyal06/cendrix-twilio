@@ -33,6 +33,11 @@ export function usePollingChats(pollInterval = POLL_INTERVAL) {
                     });
 
                     if (hasChanges) {
+                        if (Notification.permission === 'granted') {
+                            new Notification("New messages", {
+                                icon: "/logo.png",
+                            });
+                        }
                         console.log("Updating chats:", chatsData);
                         return chatsData;
                     }

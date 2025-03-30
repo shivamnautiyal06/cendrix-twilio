@@ -12,11 +12,15 @@ export default function Messages() {
     useCredentials();
 
   React.useEffect(() => {
+    // This is needed until refactor to common parent component
     const sid = localStorage.getItem("sid");
     const authToken = localStorage.getItem("authToken");
     if (sid && authToken) {
       setCredentials(sid, authToken);
     }
+
+    // Ask for notification permission
+    Notification.requestPermission();
   }, []);
 
   const { chats, setChats, selectedChat, setSelectedChat } = usePollingChats();
