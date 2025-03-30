@@ -23,6 +23,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
   const { chats, setSelectedChat, selectedChatId, activePhoneNumber } = props;
   const { phoneNumbers, setActivePhoneNumberContext } = useCredentials();
   const [contactsFilter, setContactsFilter] = useState("");
+  
   return (
     <Sheet
       sx={{
@@ -48,6 +49,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
             fontSize: { xs: "md", md: "lg" },
             fontWeight: "lg",
             mr: "auto",
+            display: { xs: "none", sm: "unset" }
           }}
         >
           Messages
@@ -56,9 +58,11 @@ export default function ChatsPane(props: ChatsPaneProps) {
           variant="plain"
           aria-label="edit"
           color="neutral"
-          sx={{ display: { xs: "none", sm: "unset" } }}
           onClick={() => {
             setSelectedChat(null);
+            if (window.innerWidth < 600) { // Approximate `xs` breakpoint
+              toggleMessagesPane();
+            }
           }}
         >
           <EditNoteRoundedIcon />
