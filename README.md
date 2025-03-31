@@ -10,8 +10,11 @@ You can use the hosted version of this app here: http://twilio-dashboard.pages.d
 - Draft new messages
 - Receive messages dynamically via polling
 - New message notifications
-- Multi phone numbers support
-- Mobile optimized
+- Support for multiple Twilio phone numbers
+- PWA (mobile and desktop installable standalone app)
+  - `Desktop/mobile`: [MDN article on installing PWAs][InstallingPWAs]
+  - `iOS`: use Safari to navigate to the [hosted site][HostedSite]. Tap share icon, "Add to Home Screen". 
+  - `Android`: use Chrome to navigate to [hosted site][HostedSite]. Tap three-dot menu, "Add to Home Screen". 
 
 ## Prerequisites
 
@@ -44,3 +47,6 @@ $ pnpm run dev
 # Build production dist/
 $ pnpm run build
 ```
+
+[HostedSite]: http://twilio-dashboard.pages.dev/
+[InstallingPWAs]: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Installing#installing_pwas
