@@ -63,7 +63,7 @@ export default function Messages() {
         sx={{
           position: { xs: "fixed", sm: "sticky" },
           transform: {
-            xs: "translateX(calc(100% * (var(--MessagesPane-slideIn, 0) - 1)))",
+            xs: "translateX(calc(-100% * (var(--MessagesPane-slideIn, 0))))",
             sm: "none",
           },
           transition: "transform 0.4s, width 0.4s",
