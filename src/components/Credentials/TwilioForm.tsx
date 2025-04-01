@@ -23,7 +23,7 @@ export default function TwilioForm() {
   );
 
   React.useEffect(() => {
-    if (sid && authToken) {
+    if (sid && authToken && !isAuthenticated) {
       setCredentials(sid, authToken);
     }
   }, []);
