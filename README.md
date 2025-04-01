@@ -12,9 +12,9 @@ You can use the hosted version of this app here: http://twilio-dashboard.pages.d
 - New message notifications
 - Support for multiple Twilio phone numbers
 - PWA (mobile and desktop installable standalone app)
-  - `Desktop/mobile`: [MDN article on installing PWAs][InstallingPWAs]
-  - `iOS`: use Safari to navigate to the [hosted site][HostedSite]. Tap share icon, "Add to Home Screen". 
-  - `Android`: use Chrome to navigate to [hosted site][HostedSite]. Tap three-dot menu, "Add to Home Screen". 
+    - `Desktop/mobile`: [MDN article on installing PWAs][InstallingPWAs]
+    - `iOS`: use Safari to navigate to the [hosted site][HostedSite]. Tap share icon, "Add to Home Screen".
+    - `Android`: use Chrome to navigate to [hosted site][HostedSite]. Tap three-dot menu, "Add to Home Screen".
 
 ## Prerequisites
 

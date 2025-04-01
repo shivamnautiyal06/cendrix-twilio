@@ -33,16 +33,17 @@ export function toggleSidebar() {
 export function openMessagesPane() {
     if (typeof window !== "undefined") {
         document.body.style.overflow = "hidden";
-        document.documentElement.style.setProperty(
-            "--MessagesPane-slideIn",
-            "1",
-        );
+        document
+            .getElementById("messages-component")!
+            .style.setProperty("--MessagesPane-slideIn", "1");
     }
 }
 
 export function closeMessagesPane() {
     if (typeof window !== "undefined") {
-        document.documentElement.style.removeProperty("--MessagesPane-slideIn");
+        document
+            .getElementById("messages-component")!
+            .style.removeProperty("--MessagesPane-slideIn");
         document.body.style.removeProperty("overflow");
     }
 }

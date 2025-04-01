@@ -18,8 +18,8 @@ export function usePollingChats(pollInterval = POLL_INTERVAL) {
                 const chatsData = await apiClient.getChats(activePhoneNumber);
 
                 if (
-                    window.Notification?.permission === "granted"
-                    && chatsData.some(chat => chat.hasUnread)
+                    window.Notification?.permission === "granted" &&
+                    chatsData.some((chat) => chat.hasUnread)
                 ) {
                     new Notification("New messages", {
                         icon: "/logo.png",
