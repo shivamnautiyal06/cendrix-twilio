@@ -17,6 +17,15 @@ export function usePollingChats(pollInterval = POLL_INTERVAL) {
             try {
                 const chatsData = await apiClient.getChats(activePhoneNumber);
 
+                if (
+                    window.Notification?.permission === "granted"
+                    && chatsData.some(chat => chat.hasUnread)
+                ) {
+                    new Notification("New messages", {
+                        icon: "/logo.png",
+                    });
+                }
+
                 setChats((prevChats) => {
                     const currentChatsMap = new Map(
                         prevChats.map((chat) => [chat.chatId, chat]),
@@ -33,14 +42,6 @@ export function usePollingChats(pollInterval = POLL_INTERVAL) {
                     });
 
                     if (hasChanges) {
-                        if (
-                            "Notification" in window &&
-                            Notification.permission === "granted"
-                        ) {
-                            new Notification("New messages", {
-                                icon: "/logo.png",
-                            });
-                        }
                         console.log("Updating chats:", chatsData);
                         return chatsData;
                     }

@@ -22,9 +22,7 @@ export default function Messages() {
     // Ask for notification permission
     // Weirdly, my mobile chrome doesn't have this obj and crashes without this guard
     // Not even Notification?.requestPermissions() works
-    if ("Notification" in window) {
-      Notification.requestPermission();
-    }
+    window.Notification?.requestPermission();
   }, []);
 
   const { chats, setChats, selectedChat, setSelectedChat } = usePollingChats();
