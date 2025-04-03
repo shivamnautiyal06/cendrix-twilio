@@ -17,14 +17,14 @@ export function usePollingChats(pollInterval = POLL_INTERVAL) {
             try {
                 const chatsData = await apiClient.getChats(activePhoneNumber);
 
-                if (
-                    window.Notification?.permission === "granted" &&
-                    chatsData.some((chat) => chat.hasUnread)
-                ) {
-                    new Notification("New messages", {
-                        icon: "/logo.png",
-                    });
-                }
+                // if (
+                //     window.Notification?.permission === "granted" &&
+                //     chatsData.some((chat) => chat.hasUnread)
+                // ) {
+                //     new Notification("New messages", {
+                //         icon: "/logo.png",
+                //     });
+                // }
 
                 setChats((prevChats) => {
                     const currentChatsMap = new Map(
