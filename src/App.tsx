@@ -6,6 +6,7 @@ import Sidebar from "./components/Sidebar";
 import Header from "./components/Messages/Header";
 import Messages from "./components/Messages/Messages";
 import TwilioForm from "./components/Credentials/TwilioForm";
+import Banner from "./components/Banner";
 import { CredentialsProvider } from "./context/CredentialsContext";
 
 export default function App() {
@@ -14,6 +15,7 @@ export default function App() {
       <CssVarsProvider disableTransitionOnChange>
         <CssBaseline />
         <Box sx={{ display: "flex", minHeight: "100dvh" }}>
+          <Banner />
           <Router>
             <Sidebar />
             <Header />
