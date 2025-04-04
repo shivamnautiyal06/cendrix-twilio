@@ -50,13 +50,13 @@ class TwilioClient {
     }
 
     async getMessages(
-        props: { from?: string; to?: string } = {},
+        props: { from?: string; to?: string; limit?: number } = {},
     ): Promise<TwilioMsg[]> {
         const res = await this.axiosInstance.get("/Messages.json", {
             params: {
                 From: props.from,
                 To: props.to,
-                PageSize: 1000,
+                PageSize: props.limit ?? 1000,
             },
         });
         return res.data.messages.map(transform);

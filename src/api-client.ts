@@ -6,17 +6,27 @@ import TwilioClient from "./services/twilio-client";
 import type { ChatInfo, PlainMessage } from "./types";
 
 class ApiClient {
-    private axiosInstance: TwilioClient;
+    axiosInstance: TwilioClient;
+
+    private static instance: ApiClient;
     private messagesService: MessagesService;
     private contactsService: ContactsService;
     private phoneNumbersService: PhoneNumbersService;
 
-    constructor(sid: string, token: string) {
+    private constructor(sid: string, token: string) {
         this.axiosInstance = new TwilioClient(sid, token);
 
         this.messagesService = new MessagesService(this.axiosInstance);
         this.contactsService = new ContactsService(this.axiosInstance);
         this.phoneNumbersService = new PhoneNumbersService(this.axiosInstance);
+    }
+
+    static getInstance(sid: string, token: string) {
+        if (!ApiClient.instance) {
+            ApiClient.instance = new ApiClient(sid, token);
+        }
+
+        return ApiClient.instance;
     }
 
     async getPhoneNumbers() {

@@ -2,7 +2,7 @@ import * as React from "react";
 import { Box, Sheet } from "@mui/joy";
 
 import MessageInput from "./MessageInput";
-import { useCredentials } from "../../context/CredentialsContext";
+import { useAuthedCreds } from "../../context/CredentialsContext";
 import NewMessagePaneHeader from "./NewMessagePaneHeader";
 
 export default function NewMessagesPane(props: {
@@ -11,7 +11,7 @@ export default function NewMessagesPane(props: {
 }) {
   const { activePhoneNumber, callback } = props;
   const [contactNumber, setContactNumber] = React.useState("");
-  const { apiClient } = useCredentials();
+  const { apiClient } = useAuthedCreds();
 
   return (
     <Sheet
@@ -26,9 +26,6 @@ export default function NewMessagesPane(props: {
       <Box sx={{ mt: "auto" }}>
         <MessageInput
           onSubmit={async (content) => {
-            if (!apiClient) {
-              return;
-            }
             await apiClient.sendMessage(
               activePhoneNumber,
               contactNumber,

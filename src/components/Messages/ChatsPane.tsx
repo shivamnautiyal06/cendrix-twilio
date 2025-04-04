@@ -17,7 +17,7 @@ import {
 
 import ChatListItem from "./ChatListItem";
 import { toggleMessagesPane } from "../../utils";
-import { useCredentials } from "../../context/CredentialsContext";
+import { useAuthedCreds } from "../../context/CredentialsContext";
 
 import type { ChatInfo } from "../../types";
 
@@ -30,7 +30,7 @@ type ChatsPaneProps = {
 
 export default function ChatsPane(props: ChatsPaneProps) {
   const { chats, setSelectedChat, selectedChatId, activePhoneNumber } = props;
-  const { phoneNumbers, setActivePhoneNumberContext } = useCredentials();
+  const { phoneNumbers, setActivePhoneNumberContext } = useAuthedCreds();
   const [contactsFilter, setContactsFilter] = useState("");
 
   return (
