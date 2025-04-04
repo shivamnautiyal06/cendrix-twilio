@@ -13,10 +13,12 @@ export class MessagesService {
         activeNumber: string,
         contactNumber: string,
     ): Promise<PlainMessage[]> {
-        const [msgsToUs, msgsFromUs] = await Promise.all([
+        const [paginatorToUs, paginatorFromUs] = await Promise.all([
             this.client.getMessages({ from: contactNumber, to: activeNumber }),
             this.client.getMessages({ from: activeNumber, to: contactNumber }),
         ]);
+        const msgsToUs = paginatorToUs.items;
+        const msgsFromUs = paginatorFromUs.items;
 
         const twilioMsgs: TwilioMsg[] = [];
 

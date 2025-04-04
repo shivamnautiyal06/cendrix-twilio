@@ -18,7 +18,7 @@ export class EventEmitter {
         this.twilioClient = twilioClient;
         this.twilioClient
             .getMessages({ limit: 1 })
-            .then((msgs) => (this.lastKnownMsgId = msgs[0].sid))
+            .then((msgs) => (this.lastKnownMsgId = msgs.items[0].sid))
             .catch((err) =>
                 console.error("EventEmitter initial fetch failed:", err),
             );
@@ -56,11 +56,11 @@ export class EventEmitter {
         setInterval(async () => {
             try {
                 if (!this.twilioClient) return;
-                const [msg] = await this.twilioClient.getMessages({ limit: 1 });
-                if (msg.sid !== this.lastKnownMsgId) {
+                const msgs = await this.twilioClient.getMessages({ limit: 1 });
+                if (msgs.items[0].sid !== this.lastKnownMsgId) {
                     const interveningMsgs = await this.fetchInterveningMsgs();
                     this.emitNewMsgs(interveningMsgs);
-                    this.lastKnownMsgId = msg.sid;
+                    this.lastKnownMsgId = msgs.items[0].sid;
                 }
             } catch (err) {
                 console.error("Failed to fetch chats:", err);
@@ -71,20 +71,21 @@ export class EventEmitter {
     private async fetchInterveningMsgs() {
         const interveningMsgs: TwilioMsg[] = [];
         let found = false;
-        while (!found) {
-            // TODO: paginate on each loop
-            const msgs = await this.twilioClient.getMessages();
-            const foundIndex = msgs.findIndex(
+
+        let msgs: Awaited<ReturnType<typeof this.twilioClient.getMessages>>;
+        do {
+            msgs = await this.twilioClient.getMessages();
+            const foundIndex = msgs.items.findIndex(
                 (m) => m.sid === this.lastKnownMsgId,
             );
             if (foundIndex !== -1) {
-                const newMsgs = msgs.slice(0, foundIndex);
+                const newMsgs = msgs.items.slice(0, foundIndex);
                 interveningMsgs.push(...newMsgs);
                 found = true;
             } else {
-                interveningMsgs.push(...msgs);
+                interveningMsgs.push(...msgs.items);
             }
-        }
+        } while (!found || msgs.hasNextPage());
 
         return interveningMsgs;
     }

@@ -34,7 +34,11 @@ export default function MessagesPane(props: MessagesPaneProps) {
       .catch((err) => console.error("Failed to fetch chat messages:", err));
 
     const subId = eventEmitter.on("new-message", (msg) => {
-      setChatMessages((prevMsgs) => [...prevMsgs, msg]);
+      const newMsgContactNumber =
+        msg.from === activePhoneNumber ? msg.to : msg.from;
+      if (newMsgContactNumber === chat.contactNumber) {
+        setChatMessages((prevMsgs) => [...prevMsgs, msg]);
+      }
     });
 
     return () => eventEmitter.off(subId);

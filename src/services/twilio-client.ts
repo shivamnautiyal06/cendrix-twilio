@@ -28,8 +28,12 @@ function transform(rawMsg: RawMsg): TwilioMsg {
 
 class TwilioClient {
     private axiosInstance: AxiosInstance;
+    private sid: string;
+    private authToken: string;
 
     constructor(sid: string, token: string) {
+        this.sid = sid;
+        this.authToken = token;
         this.axiosInstance = axios.create({
             baseURL: `https://api.twilio.com/2010-04-01/Accounts/${sid}`,
             auth: {
@@ -51,7 +55,7 @@ class TwilioClient {
 
     async getMessages(
         props: { from?: string; to?: string; limit?: number } = {},
-    ): Promise<TwilioMsg[]> {
+    ): Promise<Paginator> {
         const res = await this.axiosInstance.get("/Messages.json", {
             params: {
                 From: props.from,
@@ -59,7 +63,7 @@ class TwilioClient {
                 PageSize: props.limit ?? 1000,
             },
         });
-        return res.data.messages.map(transform);
+        return new Paginator(this.sid, this.authToken, res.data.messages.map(transform), res.data.next_page_uri, res.data.end);
     }
 
     async sendMessage(
@@ -73,6 +77,46 @@ class TwilioClient {
         params.append("To", to);
         const res = await this.axiosInstance.post("/Messages.json", params);
         return res.data;
+    }
+}
+
+class Paginator {
+    items: TwilioMsg[] = [];
+
+    private nextPageUri: string;
+    private currentPage = 0;
+    private lastPage: number;
+    private sid: string;
+    private authToken: string;
+
+    constructor(sid: string, authToken: string, items: TwilioMsg[], nextPageUri: string, lastPage: number) {
+        this.sid = sid;
+        this.authToken = authToken;
+        this.items = items;
+        this.nextPageUri = nextPageUri;
+        this.lastPage = lastPage;
+    }
+
+    hasNextPage() {
+        return this.currentPage !== this.lastPage;
+    }
+
+    async getNextPage() {
+        if (this.currentPage === this.lastPage) {
+            throw new Error("Reached the end of the iterator.");
+        }
+
+        const res = await axios.get(this.nextPageUri, {
+            auth: {
+                username: this.sid,
+                password: this.authToken,
+            },
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+        });
+
+        return new Paginator(this.sid, this.authToken, res.data.messages.map(transform), res.data.next_page_uri, res.data.end);
     }
 }
 

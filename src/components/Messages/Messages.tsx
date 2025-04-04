@@ -51,7 +51,7 @@ function Messages() {
       });
 
       if (window.Notification?.permission === "granted") {
-        new Notification("New messages", {
+        new Notification("New message", {
           icon: "/logo.png",
           body: msg.content,
         });
