@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import Box from "@mui/joy/Box";
 import Input from "@mui/joy/Input";
 import Button from "@mui/joy/Button";
@@ -21,6 +22,7 @@ export default function TwilioForm() {
   const [authToken, setAuthToken] = React.useState(
     () => localStorage.getItem("authToken") || authTokenContext,
   );
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     if (sid && authToken && !isAuthenticated) {
@@ -35,6 +37,7 @@ export default function TwilioForm() {
       if (credsValid) {
         localStorage.setItem("sid", sid);
         localStorage.setItem("authToken", authToken);
+        navigate("/messages");
       }
     } catch (err) {}
   };
