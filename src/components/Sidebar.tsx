@@ -4,7 +4,6 @@ import {
   GlobalStyles,
   Avatar,
   Box,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -77,9 +76,7 @@ export default function Sidebar() {
         onClick={() => closeSidebar()}
       />
       <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <IconButton variant="soft" color="primary" size="sm">
-          <Avatar src={logo} />
-        </IconButton>
+        <Avatar src={logo} size="sm" />
         <Typography level="title-lg">Poku</Typography>
         <ColorSchemeToggle sx={{ ml: "auto" }} />
       </Box>

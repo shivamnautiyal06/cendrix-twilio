@@ -4,46 +4,74 @@ import { Sheet } from "@mui/joy";
 import MessagesPane from "./MessagesPane";
 import ChatsPane from "./ChatsPane";
 import NewMessagesPane from "./NewMessagePane";
-import { useCredentials } from "../../context/CredentialsContext";
-import { usePollingChats } from "../../hooks/usePollingChats";
+import { useAuthedCreds } from "../../context/CredentialsContext";
+import { makeChatId } from "../../utils";
 
-export default function Messages() {
-  const { isAuthenticated, apiClient, activePhoneNumber, setCredentials } =
-    useCredentials();
+import type { ChatInfo } from "../../types";
+import withAuth from "../../context/withAuth";
+
+function Messages() {
+  const { isAuthenticated, apiClient, activePhoneNumber, eventEmitter } =
+    useAuthedCreds();
+  const [chats, setChats] = React.useState<ChatInfo[]>([]);
+  const [selectedChat, setSelectedChat] = React.useState<ChatInfo | null>(null);
 
   React.useEffect(() => {
-    // This is needed until refactor to common parent component
-    const sid = localStorage.getItem("sid");
-    const authToken = localStorage.getItem("authToken");
-    if (sid && authToken) {
-      setCredentials(sid, authToken);
-    }
+    const subId = eventEmitter.on("new-message", (msg) => {
+      const newMsgContactNumber =
+        msg.from === activePhoneNumber ? msg.to : msg.from;
+      const newMsgChatId = makeChatId(activePhoneNumber, newMsgContactNumber);
+
+      setChats((prevChats) => {
+        const index = prevChats.findIndex((c) => c.chatId === newMsgChatId);
+        if (index !== -1) {
+          const updatedChats = [...prevChats];
+          updatedChats[index] = {
+            chatId: newMsgChatId,
+            contactNumber: newMsgContactNumber,
+            hasUnread: true,
+            recentMsgContent: msg.content,
+            recentMsgDate: new Date(msg.timestamp),
+            recentMsgId: msg.id,
+          };
+          return updatedChats;
+        } else {
+          return [
+            ...prevChats,
+            {
+              chatId: newMsgChatId,
+              contactNumber: newMsgContactNumber,
+              hasUnread: true,
+              recentMsgContent: msg.content,
+              recentMsgDate: new Date(msg.timestamp),
+              recentMsgId: msg.id,
+            },
+          ];
+        }
+      });
+
+      if (window.Notification?.permission === "granted") {
+        new Notification("New message", {
+          icon: "/logo.png",
+          body: msg.content,
+        });
+      }
+    });
 
     // Ask for notification permission
-    // Weirdly, my mobile chrome doesn't have this obj and crashes without this guard
-    // Not even Notification?.requestPermissions() works
     window.Notification?.requestPermission();
-  }, []);
 
-  const { chats, setChats, selectedChat, setSelectedChat } = usePollingChats();
+    return () => eventEmitter.off(subId);
+  }, [isAuthenticated]);
 
   React.useEffect(() => {
+    apiClient
+      .getChats(activePhoneNumber)
+      .then((chats) => setChats(chats))
+      .catch((err) => console.error("Failed to fetch chats:", err));
+
     setSelectedChat(null);
-  }, [activePhoneNumber]);
-
-  if (!isAuthenticated) {
-    return (
-      <p>Please enter your Twilio credentials first in the Credentials tab.</p>
-    );
-  }
-
-  const markChatAsRead = (chatId: string) => {
-    setChats((prevChats) =>
-      prevChats.map((chat) =>
-        chat.chatId === chatId ? { ...chat, hasUnread: false } : chat,
-      ),
-    );
-  };
+  }, [isAuthenticated, activePhoneNumber]);
 
   return (
     <Sheet
@@ -80,7 +108,12 @@ export default function Messages() {
           setSelectedChat={(chat) => {
             setSelectedChat(chat);
             if (chat) {
-              markChatAsRead(chat.chatId);
+              // Mark chat as read
+              setChats((prevChats) =>
+                prevChats.map((c) =>
+                  c.chatId === chat.chatId ? { ...c, hasUnread: false } : c,
+                ),
+              );
             }
           }}
         />
@@ -94,7 +127,7 @@ export default function Messages() {
         <NewMessagesPane
           callback={async (contactNumber: string) => {
             try {
-              const chatsData = await apiClient?.getChats(activePhoneNumber)!;
+              const chatsData = await apiClient.getChats(activePhoneNumber)!;
               const chat = chatsData.filter(
                 (e) => e.contactNumber === contactNumber,
               )[0];
@@ -110,3 +143,5 @@ export default function Messages() {
     </Sheet>
   );
 }
+
+export default withAuth(Messages);

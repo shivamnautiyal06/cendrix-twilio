@@ -18,7 +18,7 @@ export class ContactsService {
             this.client.getMessages({ to: activeNumber }),
         ]);
 
-        const full = this.mergeTwoSortedArrays(inbound, outbound);
+        const full = this.mergeTwoSortedArrays(inbound.items, outbound.items);
 
         /**
          * Results are sorted by the DateSent field, with the most recent messages appearing first.

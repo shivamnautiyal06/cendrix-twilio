@@ -1,31 +1,48 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 import ApiClient from "../api-client";
+import { EventEmitter } from "../event-emitter";
 
 interface CredentialsContextType {
   sid: string;
   authToken: string;
   apiClient: ApiClient | null;
+  eventEmitter: EventEmitter | null;
   setCredentials: (sid: string, authToken: string) => Promise<boolean>;
   isAuthenticated: boolean;
   activePhoneNumber: string;
   phoneNumbers: string[];
-  setActivePhoneNumberContext: (phoneNumbers: string) => void;
+  setActivePhoneNumberContext: (phoneNumber: string) => void;
   isLoading: boolean;
 }
 
-const CredentialsContext = createContext<CredentialsContextType>({
-  sid: "",
-  authToken: "",
-  apiClient: null,
-  setCredentials: async () => true,
-  isAuthenticated: false,
-  activePhoneNumber: "",
-  phoneNumbers: [],
-  setActivePhoneNumberContext: () => {},
-  isLoading: false,
-});
+const CredentialsContext = createContext<CredentialsContextType | null>(null);
 
-export const useCredentials = () => useContext(CredentialsContext);
+export const useCredentials = () => {
+  const ctx = useContext(CredentialsContext);
+  if (!ctx)
+    throw new Error("useCredentials must be used within CredentialsProvider");
+  return ctx;
+};
+
+export const useAuthedCreds = () => {
+  const ctx = useCredentials();
+
+  if (
+    !ctx.isAuthenticated ||
+    !ctx.apiClient ||
+    !ctx.eventEmitter ||
+    ctx.isLoading
+  ) {
+    throw new Error("useAuthedCreds used before auth is ready");
+  }
+
+  // Now TypeScript knows these are defined
+  return {
+    ...ctx,
+    apiClient: ctx.apiClient,
+    eventEmitter: ctx.eventEmitter,
+  };
+};
 
 export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -33,6 +50,7 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   const [sid, setSid] = useState("");
   const [authToken, setAuthToken] = useState("");
   const [apiClient, setApiClient] = useState<ApiClient | null>(null);
+  const [eventEmitter, setEventEmitter] = useState<EventEmitter | null>(null);
   const [activePhoneNumber, setActivePhoneNumber] = useState("");
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -41,8 +59,9 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   const setCredentials = async (sid: string, authToken: string) => {
     setIsLoading(true);
     let success = true;
-    const client = new ApiClient(sid, authToken);
+    const client = ApiClient.getInstance(sid, authToken);
     try {
+      setEventEmitter(EventEmitter.getInstance(client.axiosInstance));
       setSid(sid);
       setAuthToken(authToken);
       await client.getPhoneNumbers();
@@ -55,7 +74,6 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
       setIsAuthenticated(false);
       success = false;
     }
-
     setIsLoading(false);
     return success;
   };
@@ -70,6 +88,7 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
         sid,
         authToken,
         apiClient,
+        eventEmitter,
         setCredentials,
         isAuthenticated,
         activePhoneNumber,

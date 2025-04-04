@@ -1,12 +1,12 @@
+import React from "react";
 import { Box, Sheet, Stack, Avatar } from "@mui/joy";
 
 import ChatBubble from "./ChatBubble";
 import MessageInput from "./MessageInput";
 import MessagesPaneHeader from "./MessagesPaneHeader";
-import { useCredentials } from "../../context/CredentialsContext";
-import { usePollingMessages } from "../../hooks/usePollingMessages";
+import { useAuthedCreds } from "../../context/CredentialsContext";
 
-import type { ChatInfo } from "../../types";
+import type { ChatInfo, PlainMessage } from "../../types";
 
 type MessagesPaneProps = {
   chat: ChatInfo;
@@ -15,8 +15,34 @@ type MessagesPaneProps = {
 
 export default function MessagesPane(props: MessagesPaneProps) {
   const { chat, activePhoneNumber } = props;
-  const { apiClient } = useCredentials();
-  const { chatMessages, setChatMessages } = usePollingMessages(chat);
+  const { apiClient, eventEmitter } = useAuthedCreds();
+  const [chatMessages, setChatMessages] = React.useState<PlainMessage[]>([]);
+
+  React.useEffect(() => {
+    apiClient
+      .getMessages(activePhoneNumber, chat.contactNumber)
+      .then((chatMsgs) => {
+        setChatMessages(chatMsgs);
+        const mostRecentMessageId = chatMsgs.at(-1)?.id;
+        if (mostRecentMessageId) {
+          return apiClient.updateMostRecentlySeenMessage(
+            chat.chatId,
+            mostRecentMessageId,
+          );
+        }
+      })
+      .catch((err) => console.error("Failed to fetch chat messages:", err));
+
+    const subId = eventEmitter.on("new-message", (msg) => {
+      const newMsgContactNumber =
+        msg.from === activePhoneNumber ? msg.to : msg.from;
+      if (newMsgContactNumber === chat.contactNumber) {
+        setChatMessages((prevMsgs) => [...prevMsgs, msg]);
+      }
+    });
+
+    return () => eventEmitter.off(subId);
+  }, [chat.chatId]);
 
   return (
     <Sheet
@@ -58,7 +84,7 @@ export default function MessagesPane(props: MessagesPaneProps) {
       </Box>
       <MessageInput
         onSubmit={async (content) => {
-          await apiClient?.sendMessage(
+          await apiClient.sendMessage(
             activePhoneNumber,
             chat.contactNumber,
             content,
