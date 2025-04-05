@@ -15,7 +15,6 @@ import {
 import { KeyRounded, QuestionAnswerRounded } from "@mui/icons-material";
 
 import logo from "../assets/logo.png"; // Import the logo
-import { useCredentials } from "../context/CredentialsContext";
 import ColorSchemeToggle from "./Messages/ColorSchemeToggle";
 import { closeSidebar } from "../utils";
 

@@ -11,6 +11,7 @@ import type { ChatInfo } from "../../types";
 import withAuth from "../../context/withAuth";
 
 function Messages() {
+  console.log("here1");
   const { isAuthenticated, apiClient, activePhoneNumber, eventEmitter } =
     useAuthedCreds();
   const [chats, setChats] = React.useState<ChatInfo[]>([]);
