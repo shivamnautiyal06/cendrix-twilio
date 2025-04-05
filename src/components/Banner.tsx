@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Box, IconButton } from "@mui/joy";
+import { useState } from "react";
+import { Box, IconButton, Typography } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function Banner() {
@@ -20,7 +20,7 @@ export default function Banner() {
         zIndex: 99999, // Ensures the banner is above other content
       }}
     >
-      <span>
+      <Typography>
         <a
           href="https://join.slack.com/t/pokulabs/shared_invite/zt-334pmqhy9-oZN8cMAXLFUdmDCgNZX9rA"
           target="_blank"
@@ -28,7 +28,7 @@ export default function Banner() {
           Join our Slack
         </a>{" "}
         and leave feedback or request a feature. I shall do your bidding!
-      </span>
+      </Typography>
       <IconButton
         onClick={() => setVisible(false)}
         sx={{

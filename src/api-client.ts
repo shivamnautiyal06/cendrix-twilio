@@ -7,13 +7,17 @@ import type { ChatInfo, PlainMessage } from "./types";
 
 class ApiClient {
     axiosInstance: TwilioClient;
+    sid: string;
+    authToken: string;
 
-    private static instance: ApiClient;
+    private static instance: ApiClient | undefined;
     private messagesService: MessagesService;
     private contactsService: ContactsService;
     private phoneNumbersService: PhoneNumbersService;
 
     private constructor(sid: string, token: string) {
+        this.sid = sid;
+        this.authToken = token;
         this.axiosInstance = new TwilioClient(sid, token);
 
         this.messagesService = new MessagesService(this.axiosInstance);
@@ -21,9 +25,16 @@ class ApiClient {
         this.phoneNumbersService = new PhoneNumbersService(this.axiosInstance);
     }
 
-    static getInstance(sid: string, token: string) {
-        if (!ApiClient.instance) {
-            ApiClient.instance = new ApiClient(sid, token);
+    static async getInstance(sid: string, token: string) {
+        if (
+            !ApiClient.instance ||
+            sid !== ApiClient.instance.sid ||
+            token !== ApiClient.instance.authToken
+        ) {
+            const client = new ApiClient(sid, token);
+            // Test connection
+            await client.getPhoneNumbers();
+            ApiClient.instance = client;
         }
 
         return ApiClient.instance;

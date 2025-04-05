@@ -7,7 +7,7 @@ type Event = "new-message";
 type CB = (msg: PlainMessage) => void;
 
 export class EventEmitter {
-    private static instance: EventEmitter;
+    private static instance: EventEmitter | undefined;
     private twilioClient: TwilioClient;
     private callbacks: Record<Event, CB[]> = {
         "new-message": [],
@@ -16,18 +16,25 @@ export class EventEmitter {
 
     private constructor(twilioClient: TwilioClient) {
         this.twilioClient = twilioClient;
-        this.twilioClient
-            .getMessages({ limit: 1 })
-            .then((msgs) => (this.lastKnownMsgId = msgs.items[0].sid))
-            .catch((err) =>
-                console.error("EventEmitter initial fetch failed:", err),
-            );
+    }
+
+    async init() {
+        const msgs = await this.twilioClient.getMessages({ limit: 1 });
+        this.lastKnownMsgId = msgs.items[0].sid;
         this.listenForNewMessage();
     }
 
-    static getInstance(twilioClient: TwilioClient) {
-        if (!EventEmitter.instance) {
-            EventEmitter.instance = new EventEmitter(twilioClient);
+    static async getInstance(twilioClient: TwilioClient) {
+        if (
+            !EventEmitter.instance ||
+            twilioClient.sid !== EventEmitter.instance.twilioClient.sid ||
+            twilioClient.authToken !==
+                EventEmitter.instance.twilioClient.authToken
+        ) {
+            const ee = new EventEmitter(twilioClient);
+            // Init and test connection
+            await ee.init();
+            EventEmitter.instance = ee;
         }
 
         return EventEmitter.instance;

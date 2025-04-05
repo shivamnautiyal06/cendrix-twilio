@@ -24,8 +24,8 @@ export default function App() {
               <Sidebar />
               <Header />
               <Routes>
-                <Route path="/messages" element={<Messages />} />
-                <Route path="/" element={<TwilioForm />} />
+                <Route path="/" element={<Messages />} />
+                <Route path="/credentials" element={<TwilioForm />} />
               </Routes>
             </Box>
           </Pages>

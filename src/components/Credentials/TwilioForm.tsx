@@ -1,12 +1,8 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
-import Box from "@mui/joy/Box";
-import Input from "@mui/joy/Input";
-import Button from "@mui/joy/Button";
-import Typography from "@mui/joy/Typography";
+import { Alert, Box, Input, Button, Typography } from "@mui/joy";
 
 import { useCredentials } from "../../context/CredentialsContext";
-import { Alert } from "@mui/joy";
 
 export default function TwilioForm() {
   const {
@@ -16,30 +12,18 @@ export default function TwilioForm() {
     authToken: authTokenContext,
     isLoading,
   } = useCredentials();
-  const [sid, setSid] = React.useState(
-    () => localStorage.getItem("sid") || sidContext,
-  );
-  const [authToken, setAuthToken] = React.useState(
-    () => localStorage.getItem("authToken") || authTokenContext,
-  );
+  const [sid, setSid] = React.useState(sidContext);
+  const [authToken, setAuthToken] = React.useState(authTokenContext);
   const navigate = useNavigate();
-
-  React.useEffect(() => {
-    if (sid && authToken && !isAuthenticated) {
-      setCredentials(sid, authToken);
-    }
-  }, []);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    try {
-      const credsValid = await setCredentials(sid, authToken);
-      if (credsValid) {
-        localStorage.setItem("sid", sid);
-        localStorage.setItem("authToken", authToken);
-        navigate("/messages");
-      }
-    } catch (err) {}
+    const credsValid = await setCredentials(sid, authToken);
+    localStorage.setItem("sid", sid);
+    localStorage.setItem("authToken", authToken);
+    if (credsValid) {
+      navigate("/");
+    }
   };
 
   return (

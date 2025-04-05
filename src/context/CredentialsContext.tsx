@@ -36,7 +36,6 @@ export const useAuthedCreds = () => {
     throw new Error("useAuthedCreds used before auth is ready");
   }
 
-  // Now TypeScript knows these are defined
   return {
     ...ctx,
     apiClient: ctx.apiClient,
@@ -47,8 +46,10 @@ export const useAuthedCreds = () => {
 export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
-  const [sid, setSid] = useState("");
-  const [authToken, setAuthToken] = useState("");
+  const [sid, setSid] = useState(localStorage.getItem("sid") || "");
+  const [authToken, setAuthToken] = useState(
+    localStorage.getItem("authToken") || "",
+  );
   const [apiClient, setApiClient] = useState<ApiClient | null>(null);
   const [eventEmitter, setEventEmitter] = useState<EventEmitter | null>(null);
   const [activePhoneNumber, setActivePhoneNumber] = useState("");
@@ -57,22 +58,23 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(false);
 
   const setCredentials = async (sid: string, authToken: string) => {
+    let success = false;
+    if (!sid || !authToken) return success;
     setIsLoading(true);
-    let success = true;
-    const client = ApiClient.getInstance(sid, authToken);
     try {
-      setEventEmitter(EventEmitter.getInstance(client.axiosInstance));
+      const client = await ApiClient.getInstance(sid, authToken);
+      const numbers = await client.getPhoneNumbers();
+      const ee = await EventEmitter.getInstance(client.axiosInstance);
+      setEventEmitter(ee);
       setSid(sid);
       setAuthToken(authToken);
-      await client.getPhoneNumbers();
       setApiClient(client);
-      const phoneNumbers = await client.getPhoneNumbers();
-      setPhoneNumbers(phoneNumbers);
-      setActivePhoneNumber(phoneNumbers[0]);
+      setPhoneNumbers(numbers);
+      setActivePhoneNumber(numbers[0]);
       setIsAuthenticated(true);
+      success = true;
     } catch (err) {
       setIsAuthenticated(false);
-      success = false;
     }
     setIsLoading(false);
     return success;

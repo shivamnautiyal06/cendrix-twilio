@@ -27,9 +27,10 @@ function transform(rawMsg: RawMsg): TwilioMsg {
 }
 
 class TwilioClient {
+    sid: string;
+    authToken: string;
+
     private axiosInstance: AxiosInstance;
-    private sid: string;
-    private authToken: string;
 
     constructor(sid: string, token: string) {
         this.sid = sid;
@@ -63,7 +64,13 @@ class TwilioClient {
                 PageSize: props.limit ?? 1000,
             },
         });
-        return new Paginator(this.sid, this.authToken, res.data.messages.map(transform), res.data.next_page_uri, res.data.end);
+        return new Paginator(
+            this.sid,
+            this.authToken,
+            res.data.messages.map(transform),
+            res.data.next_page_uri,
+            res.data.end,
+        );
     }
 
     async sendMessage(
@@ -89,7 +96,13 @@ class Paginator {
     private sid: string;
     private authToken: string;
 
-    constructor(sid: string, authToken: string, items: TwilioMsg[], nextPageUri: string, lastPage: number) {
+    constructor(
+        sid: string,
+        authToken: string,
+        items: TwilioMsg[],
+        nextPageUri: string,
+        lastPage: number,
+    ) {
         this.sid = sid;
         this.authToken = authToken;
         this.items = items;
@@ -116,7 +129,13 @@ class Paginator {
             },
         });
 
-        return new Paginator(this.sid, this.authToken, res.data.messages.map(transform), res.data.next_page_uri, res.data.end);
+        return new Paginator(
+            this.sid,
+            this.authToken,
+            res.data.messages.map(transform),
+            res.data.next_page_uri,
+            res.data.end,
+        );
     }
 }
 

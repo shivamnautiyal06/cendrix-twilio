@@ -12,7 +12,7 @@ import {
   Typography,
   Sheet,
 } from "@mui/joy";
-import { HomeRounded, QuestionAnswerRounded } from "@mui/icons-material";
+import { KeyRounded, QuestionAnswerRounded } from "@mui/icons-material";
 
 import logo from "../assets/logo.png"; // Import the logo
 import { useCredentials } from "../context/CredentialsContext";
@@ -21,7 +21,6 @@ import { closeSidebar } from "../utils";
 
 export default function Sidebar() {
   const location = useLocation();
-  const { isAuthenticated } = useCredentials();
 
   return (
     <Sheet
@@ -106,23 +105,21 @@ export default function Sidebar() {
               to="/"
               selected={location.pathname === "/"}
             >
-              <HomeRounded />
-              <ListItemContent>
-                <Typography level="title-sm">Credentials</Typography>
-              </ListItemContent>
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem>
-            <ListItemButton
-              disabled={!isAuthenticated}
-              component={Link}
-              to="/messages"
-              selected={location.pathname === "/messages"}
-            >
               <QuestionAnswerRounded />
               <ListItemContent>
                 <Typography level="title-sm">Messages</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+          <ListItem>
+            <ListItemButton
+              component={Link}
+              to="/credentials"
+              selected={location.pathname === "/credentials"}
+            >
+              <KeyRounded />
+              <ListItemContent>
+                <Typography level="title-sm">Credentials</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
