@@ -1,13 +1,26 @@
 import React from "react";
 import { useCredentials } from "../context/CredentialsContext";
-import { Alert, Box, Button } from "@mui/joy";
+import { Alert, Box, Button, CircularProgress } from "@mui/joy";
 import { Link } from "react-router-dom";
 
 const withAuth = <P extends object>(Component: React.ComponentType<P>) => {
   return (props: P) => {
     const { isAuthenticated, isLoading } = useCredentials();
 
-    if (isLoading) return <p>Loading...</p>;
+    if (isLoading) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%"
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )
+    };
     if (!isAuthenticated) {
       return (
         <Box

@@ -62,12 +62,12 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
     if (!sid || !authToken) return success;
     setIsLoading(true);
     try {
+      setSid(sid);
+      setAuthToken(authToken);
       const client = await ApiClient.getInstance(sid, authToken);
       const numbers = await client.getPhoneNumbers();
       const ee = await EventEmitter.getInstance(client.axiosInstance);
       setEventEmitter(ee);
-      setSid(sid);
-      setAuthToken(authToken);
       setApiClient(client);
       setPhoneNumbers(numbers);
       setActivePhoneNumber(numbers[0]);
