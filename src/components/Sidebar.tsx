@@ -12,9 +12,10 @@ import {
   Typography,
   Sheet,
 } from "@mui/joy";
-import { KeyRounded, QuestionAnswerRounded } from "@mui/icons-material";
+import { KeyRounded, QuestionAnswerRounded, GitHub } from "@mui/icons-material";
 
 import logo from "../assets/logo.png"; // Import the logo
+import slack from "../assets/slack.png";
 import ColorSchemeToggle from "./Messages/ColorSchemeToggle";
 import { closeSidebar } from "../utils";
 
@@ -119,6 +120,43 @@ export default function Sidebar() {
               <KeyRounded />
               <ListItemContent>
                 <Typography level="title-sm">Credentials</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+        </List>
+
+        <List
+          size="sm"
+          sx={{
+            mt: "auto",
+            flexGrow: 0,
+            mb: 2,
+            "--ListItem-radius": (theme) => theme.vars.radius.sm,
+          }}
+        >
+          <ListItem>
+            <ListItemButton
+              component="a"
+              href="https://join.slack.com/t/pokulabs/shared_invite/zt-334pmqhy9-oZN8cMAXLFUdmDCgNZX9rA"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Avatar size="sm" src={slack} sx={{ width: 24, height: 24 }} />
+              <ListItemContent>
+                <Typography level="title-sm">Slack</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
+          <ListItem>
+            <ListItemButton
+              component="a"
+              href="https://github.com/pokulabs/twilio-frontend"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <GitHub />
+              <ListItemContent>
+                <Typography level="title-sm">GitHub</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
