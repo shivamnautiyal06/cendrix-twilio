@@ -84,23 +84,16 @@ export default function MessagesPane(props: MessagesPaneProps) {
       </Box>
       <MessageInput
         onSubmit={async (content) => {
-          await apiClient.sendMessage(
-            activePhoneNumber,
-            chat.contactNumber,
-            content,
-          );
-          setChatMessages([
-            ...chatMessages,
-            {
-              content: content,
-              direction: "sent",
-              from: activePhoneNumber,
-              to: chat.contactNumber,
-              id: new Date().getTime().toString(),
-              status: "delivered",
-              timestamp: new Date().getTime(),
-            },
-          ]);
+          try {
+            await apiClient.sendMessage(
+              activePhoneNumber,
+              chat.contactNumber,
+              content,
+            );
+            await eventEmitter.checkForNewMessage();
+          } catch (err) {
+            console.error("Erroring sending text message:", err);
+          }
         }}
       />
     </Sheet>

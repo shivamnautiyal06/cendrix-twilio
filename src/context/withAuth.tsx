@@ -14,13 +14,13 @@ const withAuth = <P extends object>(Component: React.ComponentType<P>) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            width: "100%"
+            width: "100%",
           }}
         >
           <CircularProgress />
         </Box>
-      )
-    };
+      );
+    }
     if (!isAuthenticated) {
       return (
         <Box

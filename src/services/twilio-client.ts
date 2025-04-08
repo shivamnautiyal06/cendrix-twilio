@@ -69,7 +69,6 @@ class TwilioClient {
             this.authToken,
             res.data.messages.map(transform),
             res.data.next_page_uri,
-            res.data.end,
         );
     }
 
@@ -90,9 +89,7 @@ class TwilioClient {
 class Paginator {
     items: TwilioMsg[] = [];
 
-    private nextPageUri: string;
-    private currentPage = 0;
-    private lastPage: number;
+    private nextPageUri: string | null;
     private sid: string;
     private authToken: string;
 
@@ -101,21 +98,19 @@ class Paginator {
         authToken: string,
         items: TwilioMsg[],
         nextPageUri: string,
-        lastPage: number,
     ) {
         this.sid = sid;
         this.authToken = authToken;
         this.items = items;
         this.nextPageUri = nextPageUri;
-        this.lastPage = lastPage;
     }
 
     hasNextPage() {
-        return this.currentPage !== this.lastPage;
+        return !!this.nextPageUri;
     }
 
     async getNextPage() {
-        if (this.currentPage === this.lastPage) {
+        if (!this.nextPageUri) {
             throw new Error("Reached the end of the iterator.");
         }
 
@@ -134,7 +129,6 @@ class Paginator {
             this.authToken,
             res.data.messages.map(transform),
             res.data.next_page_uri,
-            res.data.end,
         );
     }
 }

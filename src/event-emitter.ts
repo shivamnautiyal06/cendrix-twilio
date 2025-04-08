@@ -21,7 +21,7 @@ export class EventEmitter {
     async init() {
         const msgs = await this.twilioClient.getMessages({ limit: 1 });
         this.lastKnownMsgId = msgs.items[0].sid;
-        this.listenForNewMessage();
+        setInterval(this.checkForNewMessage.bind(this), POLL_INTERVAL);
     }
 
     static async getInstance(twilioClient: TwilioClient) {
@@ -50,6 +50,21 @@ export class EventEmitter {
         this.callbacks[event].splice(index, 1);
     }
 
+    async checkForNewMessage() {
+        try {
+            if (!this.twilioClient) return;
+            const msgs = await this.twilioClient.getMessages({ limit: 1 });
+            if (msgs.items[0].sid !== this.lastKnownMsgId) {
+                const interveningMsgs = await this.fetchInterveningMsgs();
+                console.log(interveningMsgs);
+                this.lastKnownMsgId = msgs.items[0].sid;
+                this.emitNewMsgs(interveningMsgs);
+            }
+        } catch (err) {
+            console.error("Failed to fetch chats:", err);
+        }
+    }
+
     private createId(event: Event, index: number) {
         return `${event}:${index}`;
     }
@@ -59,29 +74,13 @@ export class EventEmitter {
         return { event: event as Event, index: +index };
     }
 
-    private listenForNewMessage() {
-        setInterval(async () => {
-            try {
-                if (!this.twilioClient) return;
-                const msgs = await this.twilioClient.getMessages({ limit: 1 });
-                if (msgs.items[0].sid !== this.lastKnownMsgId) {
-                    const interveningMsgs = await this.fetchInterveningMsgs();
-                    this.emitNewMsgs(interveningMsgs);
-                    this.lastKnownMsgId = msgs.items[0].sid;
-                }
-            } catch (err) {
-                console.error("Failed to fetch chats:", err);
-            }
-        }, POLL_INTERVAL);
-    }
-
     private async fetchInterveningMsgs() {
         const interveningMsgs: TwilioMsg[] = [];
         let found = false;
+        let iteration = 0;
 
-        let msgs: Awaited<ReturnType<typeof this.twilioClient.getMessages>>;
+        let msgs = await this.twilioClient.getMessages();
         do {
-            msgs = await this.twilioClient.getMessages();
             const foundIndex = msgs.items.findIndex(
                 (m) => m.sid === this.lastKnownMsgId,
             );
@@ -92,14 +91,21 @@ export class EventEmitter {
             } else {
                 interveningMsgs.push(...msgs.items);
             }
-        } while (!found || msgs.hasNextPage());
+
+            if (msgs.hasNextPage()) {
+                msgs = await msgs.getNextPage();
+            }
+
+            iteration++;
+        } while (!found && msgs.hasNextPage() && iteration < 100);
 
         return interveningMsgs;
     }
 
     private emitNewMsgs(msgs: TwilioMsg[]) {
+        const msgsOldestToNewest = msgs.reverse();
         for (const cb of this.callbacks["new-message"]) {
-            for (const msg of msgs) {
+            for (const msg of msgsOldestToNewest) {
                 cb({
                     content: msg.body,
                     timestamp: msg.dateSent.getTime(),

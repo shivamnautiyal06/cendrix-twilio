@@ -6,9 +6,9 @@ import ChatsPane from "./ChatsPane";
 import NewMessagesPane from "./NewMessagePane";
 import { useAuthedCreds } from "../../context/CredentialsContext";
 import { makeChatId } from "../../utils";
+import withAuth from "../../context/withAuth";
 
 import type { ChatInfo } from "../../types";
-import withAuth from "../../context/withAuth";
 
 function Messages() {
   const { isAuthenticated, apiClient, activePhoneNumber, eventEmitter } =
@@ -51,7 +51,7 @@ function Messages() {
       });
 
       if (window.Notification?.permission === "granted") {
-        new Notification("New message", {
+        new Notification(`New message ${msg.direction}`, {
           icon: "/logo.png",
           body: msg.content,
         });
