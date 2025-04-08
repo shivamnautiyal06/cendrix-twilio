@@ -1,7 +1,7 @@
 # Twilio Frontend
 
 A clean frontend-only webapp to send & receive SMS messages via Twilio.  
-You can use the hosted version of this app here: http://twilio-dashboard.pages.dev/
+You can use the hosted version of this app here: https://dashboard.pokulabs.com
 
 ## Features
 
@@ -48,5 +48,5 @@ $ pnpm run dev
 $ pnpm run build
 ```
 
-[HostedSite]: http://twilio-dashboard.pages.dev/
+[HostedSite]: https://dashboard.pokulabs.com/
 [InstallingPWAs]: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Installing#installing_pwas
