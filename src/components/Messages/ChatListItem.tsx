@@ -25,7 +25,7 @@ export default function ChatListItem(props: ChatListItemProps) {
   const { chat, selectedChatId, setSelectedChat } = props;
   const selected = selectedChatId === chat.chatId;
   return (
-    <React.Fragment>
+    <>
       <ListItem>
         <ListItemButton
           onClick={() => {
@@ -34,19 +34,25 @@ export default function ChatListItem(props: ChatListItemProps) {
           }}
           selected={selected}
           color="neutral"
-          sx={{ flexDirection: "column", alignItems: "initial", gap: 1 }}
+          sx={{ flexDirection: "row", alignItems: "center", gap: 1 }}
         >
-          <Stack direction="row" spacing={1.5}>
-            <Avatar />
-            <Box sx={{ flex: 1 }}>
-              <Typography level="title-sm" sx={{ alignItems: "center" }}>
-                {chat.contactNumber}
-              </Typography>
-            </Box>
-            <Box sx={{ lineHeight: 1.5, textAlign: "right" }}>
-              {chat.hasUnread && (
-                <Circle sx={{ fontSize: 12 }} color="primary" />
-              )}
+          <Circle
+            sx={{
+              fontSize: 10,
+              visibility: chat.hasUnread ? "visible" : "hidden",
+              alignSelf: "center",
+            }}
+            color="primary"
+          />
+          <Avatar />
+          <Stack direction="column" spacing={0.5} sx={{ width: "100%" }}>
+            <Stack
+              direction="row"
+              spacing={0}
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <Typography level="title-sm">{chat.contactNumber}</Typography>
               <Typography
                 level="body-xs"
                 noWrap
@@ -54,23 +60,23 @@ export default function ChatListItem(props: ChatListItemProps) {
               >
                 {displayDateTime(chat.recentMsgDate)}
               </Typography>
-            </Box>
+            </Stack>
+            <Typography
+              level="body-sm"
+              sx={{
+                display: "-webkit-box",
+                WebkitLineClamp: "1",
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {chat.recentMsgContent}
+            </Typography>
           </Stack>
-          <Typography
-            level="body-sm"
-            sx={{
-              display: "-webkit-box",
-              WebkitLineClamp: "1",
-              WebkitBoxOrient: "vertical",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-            }}
-          >
-            {chat.recentMsgContent}
-          </Typography>
         </ListItemButton>
       </ListItem>
       <ListDivider sx={{ margin: 0 }} />
-    </React.Fragment>
+    </>
   );
 }
