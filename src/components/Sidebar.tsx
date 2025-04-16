@@ -20,6 +20,7 @@ import {
   ShareRounded,
   AccountCircle,
   LogoutRounded,
+  DescriptionRounded,
 } from "@mui/icons-material";
 
 import logo from "../assets/logo.png"; // Import the logo
@@ -157,6 +158,19 @@ export default function Sidebar() {
             "--ListItem-radius": (theme) => theme.vars.radius.sm,
           }}
         >
+          <ListItem>
+            <ListItemButton
+              component="a"
+              href="https://docs.google.com/document/d/1gIfciWfCTrKlyVgYXdARi6ZJhOiOfOPDtq39FtwEYBA/edit?usp=sharing"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <DescriptionRounded  />
+              <ListItemContent>
+                <Typography level="title-sm">Documentatiuon</Typography>
+              </ListItemContent>
+            </ListItemButton>
+          </ListItem>
           <ListItem>
             <ListItemButton
               component="a"
