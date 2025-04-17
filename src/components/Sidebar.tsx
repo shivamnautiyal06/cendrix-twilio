@@ -26,7 +26,7 @@ import {
 import logo from "../assets/logo.png"; // Import the logo
 import slack from "../assets/slack.png";
 import ColorSchemeToggle from "./Messages/ColorSchemeToggle";
-import { closeSidebar } from "../utils";
+import { closeSidebar, DOCS_LINK, GITHUB_LINK, SLACK_LINK } from "../utils";
 import { useAuth } from "../context/AuthContext";
 import { googleLogout } from "@react-oauth/google";
 
@@ -161,7 +161,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton
               component="a"
-              href="https://docs.google.com/document/d/1gIfciWfCTrKlyVgYXdARi6ZJhOiOfOPDtq39FtwEYBA/edit?usp=sharing"
+              href={DOCS_LINK}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -174,7 +174,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton
               component="a"
-              href="https://join.slack.com/t/pokulabs/shared_invite/zt-334pmqhy9-oZN8cMAXLFUdmDCgNZX9rA"
+              href={SLACK_LINK}
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -187,7 +187,7 @@ export default function Sidebar() {
           <ListItem>
             <ListItemButton
               component="a"
-              href="https://github.com/pokulabs/twilio-frontend"
+              href={GITHUB_LINK}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -7,6 +7,7 @@ import {
   Link,
   Stack,
   Switch,
+  Tooltip,
   Typography,
 } from "@mui/joy";
 import {
@@ -15,7 +16,7 @@ import {
   InfoOutlined,
 } from "@mui/icons-material";
 
-import { toggleMessagesPane } from "../../utils";
+import { DOCS_LINK, toggleMessagesPane } from "../../utils";
 import { useAuthedCreds } from "../../context/CredentialsContext";
 
 import type { ChatInfo } from "../../types";
@@ -102,16 +103,27 @@ export default function MessagesPaneHeader(props: MessagesPaneHeaderProps) {
                 }
               >
                 <Typography color="neutral">
-                  This toggles the state of the chat.{" "}
+                  Use this to tell your agent whether to respond to this chat or not.{" "}
+                  <br />
+                  Must be{" "}
                   <Link
                     component="button"
                     onClick={() => {
                       navigate("/account");
                     }}
                   >
-                    Login
+                    logged in
                   </Link>{" "}
-                  to use it.
+                  to use.
+                  <br />
+                  Learn more in our{" "}
+                  <Link
+                    href={DOCS_LINK}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    docs
+                  </Link>.
                 </Typography>
               </Alert>
             </Box>
@@ -148,23 +160,25 @@ function Toggle({ chat, isInfoShown, setIsInfoShown }: ToggleProps) {
 
   return (
     <Stack spacing={1} direction="row">
-      <Switch
-        checked={switchValue}
-        onChange={(e) => {
-          if (!isAuthenticated) {
-            setIsInfoShown(true);
-            return;
-          }
+      <Tooltip title="Use this to tell your agent whether to respond to this chat or not.">
+        <Switch
+          checked={switchValue}
+          onChange={(e) => {
+            if (!isAuthenticated) {
+              setIsInfoShown(true);
+              return;
+            }
 
-          const isChecked = e.target.checked;
-          twilioClient
-            .setToggle(chat.chatId, isChecked)
-            .then(() => {
-              setSwitchValue(isChecked);
-            })
-            .catch((err) => console.error(err));
-        }}
-      />
+            const isChecked = e.target.checked;
+            twilioClient
+              .setToggle(chat.chatId, isChecked)
+              .then(() => {
+                setSwitchValue(isChecked);
+              })
+              .catch((err) => console.error(err));
+          }}
+        />
+      </Tooltip>
       <IconButton onClick={() => setIsInfoShown(!isInfoShown)}>
         <InfoOutlined />
       </IconButton>
