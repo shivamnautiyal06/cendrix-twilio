@@ -63,7 +63,7 @@ export default function ChatBubble(props: ChatBubbleProps) {
                 : {
                     color: "var(--joy-palette-text-primary)",
                   },
-              status !== "delivered" && status !== "received"
+              !["delivered", "received", "read"].includes(status)
                 ? {
                     color: "var(--joy-palette-danger-400)",
                   }

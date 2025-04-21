@@ -167,7 +167,7 @@ export default function Sidebar() {
             >
               <DescriptionRounded  />
               <ListItemContent>
-                <Typography level="title-sm">Documentatiuon</Typography>
+                <Typography level="title-sm">Documentation</Typography>
               </ListItemContent>
             </ListItemButton>
           </ListItem>
