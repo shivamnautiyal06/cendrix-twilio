@@ -41,7 +41,7 @@ export default function Account() {
           <br />
           &bull; Chat toggle
           <br />
-          &bull; Decision agent (coming soon)
+          &bull; Decision agent
         </Typography>
         <Login />
       </Card>
@@ -68,7 +68,7 @@ function Login() {
           }
         }}
         onError={() => {
-          console.log("Google login failed");
+          console.error("Google login failed");
         }}
         size="medium"
         // width={360}
