@@ -58,6 +58,7 @@ export default function DecisionAgent() {
             noWrap
             sx={{
               "& thead th:nth-of-type(1)": { width: "60%" },
+              "& thead th:nth-of-type(2)": { width: "25%" },
               "& tr td:last-child": { textAlign: "right" },
             }}
           >
