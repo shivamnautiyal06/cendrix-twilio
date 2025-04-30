@@ -5,10 +5,11 @@ import {
   Box,
   Table,
   Button,
-  Switch,
   Sheet,
   Stack,
   IconButton,
+  Select,
+  Option,
 } from "@mui/joy";
 import { Delete } from "@mui/icons-material";
 import { apiClient } from "../../api-client";
@@ -48,7 +49,7 @@ export default function DecisionAgent() {
   return (
     <Box>
       <Typography level="h4" gutterBottom>
-        Decision Agents
+        Flagging Rules
       </Typography>
 
       {agents.length > 0 && (
@@ -70,9 +71,11 @@ export default function DecisionAgent() {
             <tbody>
               {agents.map((agent) => (
                 <tr key={agent.id}>
-                  <td>{agent.prompt}</td>
+                  <td title={agent.prompt}>{agent.prompt}</td>
                   <td>
-                    {agent.messageDirection === "inbound" ? "→ In" : "Out →"}
+                    {agent.messageDirection === "inbound"
+                      ? "→ inbound"
+                      : "outbound →"}
                   </td>
                   <td>
                     <IconButton
@@ -90,27 +93,34 @@ export default function DecisionAgent() {
         </Sheet>
       )}
 
-      <Stack spacing={2}>
-        I want to flag messages that:
+      <Stack spacing={1}>
+        <Box
+          sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 1,
+            flexWrap: "wrap",
+          }}
+        >
+          <Typography level="body-md">I want to flag</Typography>
+          <Select
+            value={newDirection}
+            onChange={(_event, direction) => setNewDirection(direction!)}
+          >
+            <Option value="inbound">inbound</Option>
+            <Option value="outbound">outbound</Option>
+          </Select>
+          <Typography level="body-md">messages that:</Typography>
+        </Box>
+
         <Textarea
           minRows={3}
           placeholder="Contain financial advice or information."
           value={newPrompt}
           onChange={(e) => setNewPrompt(e.target.value)}
         />
-        <Box sx={{ justifyContent: "start" }}>
-          <Switch
-            startDecorator="Inbound"
-            endDecorator="Outbound"
-            color="success"
-            checked={newDirection === "outbound"}
-            onChange={(e) =>
-              setNewDirection(e.target.checked ? "outbound" : "inbound")
-            }
-          />
-        </Box>
         <Button onClick={handleCreate} disabled={!newPrompt}>
-          Add Agent
+          Add Rule
         </Button>
       </Stack>
     </Box>

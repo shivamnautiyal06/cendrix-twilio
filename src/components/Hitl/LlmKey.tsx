@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
-import { Button, Typography, Input, Stack } from "@mui/joy";
+import {
+  Button,
+  Typography,
+  Input,
+  Stack,
+  IconButton,
+  Tooltip,
+} from "@mui/joy";
 import { apiClient } from "../../api-client";
-import { Check } from "@mui/icons-material";
+import { Check, InfoOutlined } from "@mui/icons-material";
 
 export default function LlmKey() {
   const [llmKey, setLlmKey] = useState("");
@@ -23,8 +30,34 @@ export default function LlmKey() {
 
   return (
     <Stack spacing={1}>
-      <Typography level="h4" gutterBottom>
-        LLM Key
+      <Typography
+        level="h4"
+        endDecorator={
+          <Tooltip
+            sx={{ maxWidth: 400, zIndex: 10000 }}
+            enterTouchDelay={0}
+            leaveDelay={100}
+            leaveTouchDelay={10000}
+            variant="outlined"
+            placement="bottom"
+            arrow
+            title={
+              <Typography color="neutral">
+                <b>Why we need this</b>
+                <br />
+                Your OpenAI API Key powers the decision engine behind message
+                flagging. It reads inbound/outbound messages and identifies ones
+                that match thte criteria you set below.
+              </Typography>
+            }
+          >
+            <IconButton>
+              <InfoOutlined />
+            </IconButton>
+          </Tooltip>
+        }
+      >
+        OpenAI API Key
       </Typography>
 
       {isSaved ? (
@@ -33,7 +66,7 @@ export default function LlmKey() {
           sx={{ mb: 2 }}
           endDecorator={<Check color="success" />}
         >
-          OpenAI API key saved
+          API key saved
         </Typography>
       ) : (
         <Typography level="body-md" sx={{ mb: 2 }}>
@@ -45,6 +78,7 @@ export default function LlmKey() {
         value={llmKey}
         onChange={(e) => setLlmKey(e.target.value)}
         placeholder={isSaved ? "Enter a new key to replace it" : ""}
+        type="password"
       />
       <Button onClick={handleSave} disabled={!llmKey}>
         Save

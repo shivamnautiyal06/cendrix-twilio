@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import {
-  Alert,
   Avatar,
-  Box,
   Button,
   Chip,
   IconButton,
@@ -15,11 +13,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/joy";
-import {
-  ArrowBackIosNewRounded,
-  CloseRounded,
-  InfoOutlined,
-} from "@mui/icons-material";
+import { ArrowBackIosNewRounded, InfoOutlined } from "@mui/icons-material";
 
 import { DOCS_LINK, toggleMessagesPane } from "../../utils";
 
@@ -34,8 +28,6 @@ type MessagesPaneHeaderProps = {
 
 export default function MessagesPaneHeader(props: MessagesPaneHeaderProps) {
   const { chat } = props;
-  const [isInfoShown, setIsInfoShown] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <Stack
@@ -49,111 +41,47 @@ export default function MessagesPaneHeader(props: MessagesPaneHeaderProps) {
         backgroundColor: "background.body",
       }}
     >
-      <Stack direction="column" sx={{ flexGrow: 1 }}>
-        <Stack direction="row" justifyContent="space-between">
-          <Stack
-            direction="row"
-            sx={{ alignItems: "center" }}
-            spacing={{ xs: 1, md: 2 }}
-          >
-            <IconButton
-              variant="plain"
-              color="neutral"
-              size="sm"
-              sx={{ display: { xs: "inline-flex", sm: "none" } }}
-              onClick={() => toggleMessagesPane()}
-            >
-              <ArrowBackIosNewRounded />
-            </IconButton>
-            <Avatar size="lg" />
-            <Typography
-              component="h2"
-              noWrap
-              sx={{ fontWeight: "lg", fontSize: "lg" }}
-            >
-              {chat.contactNumber}
-            </Typography>
-            {chat.isFlagged && (
-              <Resolve
-                chatId={chat.chatId}
-                reason={chat.flaggedReason}
-                message={chat.flaggedMessage}
-              />
-            )}
-          </Stack>
-          <Toggle
-            chat={chat}
-            isInfoShown={isInfoShown}
-            setIsInfoShown={setIsInfoShown}
+      <Stack
+        direction="row"
+        sx={{ alignItems: "center" }}
+        spacing={{ xs: 1, md: 2 }}
+      >
+        <IconButton
+          variant="plain"
+          color="neutral"
+          size="sm"
+          sx={{ display: { xs: "inline-flex", sm: "none" } }}
+          onClick={() => toggleMessagesPane()}
+        >
+          <ArrowBackIosNewRounded />
+        </IconButton>
+        <Avatar size="lg" />
+        <Typography
+          component="h2"
+          noWrap
+          sx={{ fontWeight: "lg", fontSize: "lg" }}
+        >
+          {chat.contactNumber}
+        </Typography>
+        {chat.isFlagged && (
+          <Resolve
+            chatId={chat.chatId}
+            reason={chat.flaggedReason}
+            message={chat.flaggedMessage}
           />
-        </Stack>
-
-        {isInfoShown && (
-          <Box
-            sx={{
-              pt: 1,
-              display: "flex",
-              justifyContent: "flex-end",
-            }}
-          >
-            <Box
-              sx={{
-                maxWidth: "100%", // optional safeguard
-              }}
-            >
-              <Alert
-                variant="soft"
-                color="neutral"
-                endDecorator={
-                  <IconButton
-                    variant="soft"
-                    color="neutral"
-                    onClick={() => setIsInfoShown(false)}
-                  >
-                    <CloseRounded />
-                  </IconButton>
-                }
-              >
-                <Typography color="neutral">
-                  Use this to tell your agent whether to respond to this chat or
-                  not. <br />
-                  Must be{" "}
-                  <Link
-                    component="button"
-                    onClick={() => {
-                      navigate("/account");
-                    }}
-                  >
-                    logged in
-                  </Link>{" "}
-                  to use.
-                  <br />
-                  Learn more in our{" "}
-                  <Link
-                    href={DOCS_LINK}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    docs
-                  </Link>
-                  .
-                </Typography>
-              </Alert>
-            </Box>
-          </Box>
         )}
       </Stack>
+      <Toggle chat={chat} />
     </Stack>
   );
 }
 
 type ToggleProps = {
   chat: ChatInfo;
-  isInfoShown: boolean;
-  setIsInfoShown: (val: boolean) => void;
 };
 
-function Toggle({ chat, isInfoShown, setIsInfoShown }: ToggleProps) {
+function Toggle({ chat }: ToggleProps) {
+  const navigate = useNavigate();
   const [switchValue, setSwitchValue] = useState(false);
   const { isAuthenticated } = useAuth();
 
@@ -172,28 +100,57 @@ function Toggle({ chat, isInfoShown, setIsInfoShown }: ToggleProps) {
 
   return (
     <Stack spacing={1} direction="row">
-      <Tooltip title="Use this to tell your agent whether to respond to this chat or not.">
-        <Switch
-          checked={switchValue}
-          onChange={(e) => {
-            if (!isAuthenticated) {
-              setIsInfoShown(true);
-              return;
-            }
+      <Switch
+        checked={switchValue}
+        onChange={(e) => {
+          if (!isAuthenticated) {
+            return;
+          }
 
-            const isChecked = e.target.checked;
-            apiClient
-              .setToggle(chat.chatId, isChecked)
-              .then(() => {
-                setSwitchValue(isChecked);
-              })
-              .catch((err) => console.error(err));
-          }}
-        />
+          const isChecked = e.target.checked;
+          apiClient
+            .setToggle(chat.chatId, isChecked)
+            .then(() => {
+              setSwitchValue(isChecked);
+            })
+            .catch((err) => console.error(err));
+        }}
+      />
+      <Tooltip
+        sx={{ maxWidth: 400 }}
+        enterTouchDelay={0}
+        leaveDelay={100}
+        leaveTouchDelay={10000}
+        variant="outlined"
+        placement="bottom"
+        arrow
+        title={
+          <Typography color="neutral">
+            Use this to tell your agent whether to respond to this chat or not.{" "}
+            <br />
+            Must be{" "}
+            <Link
+              component="button"
+              onClick={() => {
+                navigate("/account");
+              }}
+            >
+              logged in
+            </Link>{" "}
+            to use.
+            <br />
+            Learn more in our{" "}
+            <Link href={DOCS_LINK} target="_blank" rel="noopener noreferrer">
+              docs
+            </Link>
+            .
+          </Typography>
+        }
+      >
+        <IconButton>
+          <InfoOutlined />
+        </IconButton>
       </Tooltip>
-      <IconButton onClick={() => setIsInfoShown(!isInfoShown)}>
-        <InfoOutlined />
-      </IconButton>
     </Stack>
   );
 }
@@ -207,7 +164,7 @@ function Resolve(props: {
   return (
     <>
       <Chip variant="outlined" color="warning" onClick={() => setOpen(true)}>
-        Resolve
+        Review required
       </Chip>
       <Modal
         open={open}
@@ -227,7 +184,7 @@ function Resolve(props: {
               textColor="inherit"
               sx={{ fontWeight: "lg", mb: 1 }}
             >
-              Your Decision Agent flagged this chat for review
+              This chat was flagged for review
             </Typography>
             <Typography textColor="text.tertiary">
               <b>Message received:</b>

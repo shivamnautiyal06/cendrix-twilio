@@ -1,4 +1,4 @@
-import { Box } from "@mui/joy";
+import { Box, Typography } from "@mui/joy";
 
 import LlmKey from "./LlmKey";
 import DecisionAgent from "./Agent";
@@ -13,10 +13,13 @@ function Hitl() {
         flexDirection: "column",
         p: 4,
         gap: 5,
-        width: "100%",
         maxWidth: 500,
       }}
     >
+      <Typography>
+        Automatically flag messages for review based on your own rules.
+      </Typography>
+
       <LlmKey />
       <DecisionAgent />
     </Box>

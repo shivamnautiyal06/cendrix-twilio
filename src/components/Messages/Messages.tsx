@@ -17,11 +17,13 @@ function Messages() {
   const { isAuthenticated, twilioClient, activePhoneNumber, eventEmitter } =
     useAuthedCreds();
   const [chats, setChats] = useSortedChats([]);
-  const [selectedChatId, setSelectedChatId] = React.useState<string | null>(null);
+  const [selectedChatId, setSelectedChatId] = React.useState<string | null>(
+    null,
+  );
 
   const selectedChat = React.useMemo(
     () => chats.find((c) => c.chatId === selectedChatId) ?? null,
-    [chats, selectedChatId]
+    [chats, selectedChatId],
   );
 
   useWebSocketEvent("flag-update", (payload) => {
