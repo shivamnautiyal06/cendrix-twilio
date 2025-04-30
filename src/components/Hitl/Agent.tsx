@@ -116,7 +116,7 @@ export default function DecisionAgent() {
 
         <Textarea
           minRows={3}
-          placeholder="Contain financial advice or information."
+          placeholder="ask to speak to a human or staff member."
           value={newPrompt}
           onChange={(e) => setNewPrompt(e.target.value)}
         />

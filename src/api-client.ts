@@ -12,11 +12,19 @@ class ApiClient {
         });
 
         this.api.interceptors.request.use((config) => {
+            const controller = new AbortController();
+
             const user = storage.getUser();
-            if (user.idToken) {
+            if (user.idToken && import.meta.env.VITE_API_URL) {
                 config.headers.Authorization = `Bearer ${user.idToken}`;
+            } else {
+                controller.abort();
             }
-            return config;
+          
+            return {
+                ...config,
+                signal: controller.signal,
+            };
         });
     }
 
@@ -89,6 +97,9 @@ class ApiClient {
     }
 
     async login(credentialResponse: CredentialResponse) {
+        if (!import.meta.env.VITE_API_URL) {
+            throw new Error("Must supply env var: VITE_API_URL");
+        }
         return axios.post(import.meta.env.VITE_API_URL + "/auth/google", {
             token: credentialResponse.credential,
         });

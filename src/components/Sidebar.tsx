@@ -221,6 +221,7 @@ export default function Sidebar() {
               <Typography level="body-xs">{user?.email}</Typography>
             </Box>
             <IconButton
+              title="Logout"
               size="sm"
               variant="plain"
               color="neutral"

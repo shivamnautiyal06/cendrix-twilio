@@ -41,7 +41,7 @@ export default function Account() {
           <br />
           &bull; Chat toggle
           <br />
-          &bull; Decision agent
+          &bull; Flagging rules
         </Typography>
         <Login />
       </Card>
