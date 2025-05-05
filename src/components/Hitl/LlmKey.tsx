@@ -42,7 +42,7 @@ export default function LlmKey() {
             placement="bottom"
             arrow
             title={
-              <Typography color="neutral">
+              <Typography level="body-md" color="neutral">
                 <b>Why we need this</b>
                 <br />
                 Your OpenAI API Key powers the decision engine behind message
