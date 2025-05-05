@@ -4,7 +4,7 @@ const EX_1_REQ = `{
     "event": "update-autonomy-state",
     "data": {
       "id": "+12223334444+15556667777",
-      "isEnabled": false
+      "isDisabled": false
     }
   }`;
 

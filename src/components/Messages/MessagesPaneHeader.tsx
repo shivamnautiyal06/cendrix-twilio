@@ -82,7 +82,7 @@ type ToggleProps = {
 
 function Toggle({ chat }: ToggleProps) {
   const navigate = useNavigate();
-  const [switchValue, setSwitchValue] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -93,7 +93,7 @@ function Toggle({ chat }: ToggleProps) {
     apiClient
       .getToggle(chat.chatId)
       .then((res) => {
-        setSwitchValue(res.data.isEnabled);
+        setIsDisabled(res.data.isDisabled);
       })
       .catch((err) => console.error(err));
   }, [chat]);
@@ -101,7 +101,7 @@ function Toggle({ chat }: ToggleProps) {
   return (
     <Stack spacing={1} direction="row">
       <Switch
-        checked={switchValue}
+        checked={!isDisabled}
         onChange={(e) => {
           if (!isAuthenticated) {
             return;
@@ -109,9 +109,9 @@ function Toggle({ chat }: ToggleProps) {
 
           const isChecked = e.target.checked;
           apiClient
-            .setToggle(chat.chatId, isChecked)
+            .setToggle(chat.chatId, !isChecked)
             .then(() => {
-              setSwitchValue(isChecked);
+              setIsDisabled(!isChecked);
             })
             .catch((err) => console.error(err));
         }}

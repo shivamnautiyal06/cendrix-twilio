@@ -7,7 +7,7 @@ export type ChatInfo = {
     recentMsgId: string;
     recentMsgContent: string;
     hasUnread: boolean;
-    isEnabled?: boolean;
+    isDisabled?: boolean;
     isFlagged?: boolean;
     flaggedReason?: string;
     flaggedMessage?: string;

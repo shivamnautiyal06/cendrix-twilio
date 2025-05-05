@@ -66,7 +66,7 @@ class ApiClient {
         return this.api.get<{
             data: {
                 chatCode: string;
-                isEnabled: boolean;
+                isDisabled: boolean;
                 isFlagged: boolean;
                 flaggedReason: string | undefined;
                 flaggedMessage: string | undefined;
@@ -86,9 +86,9 @@ class ApiClient {
         return this.api.get(`/chats/${chatId}`);
     }
 
-    async setToggle(chatId: string, isEnabled: boolean) {
+    async setToggle(chatId: string, isDisabled: boolean) {
         return this.api.post(`/chats/${chatId}/toggle`, {
-            isEnabled,
+            isDisabled,
         });
     }
 
