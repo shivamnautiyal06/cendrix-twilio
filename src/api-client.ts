@@ -20,7 +20,7 @@ class ApiClient {
             } else {
                 controller.abort();
             }
-          
+
             return {
                 ...config,
                 signal: controller.signal,

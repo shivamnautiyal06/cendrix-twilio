@@ -13,7 +13,12 @@ import {
   Tooltip,
   Typography,
 } from "@mui/joy";
-import { ArrowBackIosNewRounded, InfoOutlined } from "@mui/icons-material";
+import {
+  ArrowBackIosNewRounded,
+  AutoAwesome,
+  InfoOutlined,
+  SportsMartialArtsRounded,
+} from "@mui/icons-material";
 
 import { DOCS_LINK, toggleMessagesPane } from "../../utils";
 
@@ -101,6 +106,9 @@ function Toggle({ chat }: ToggleProps) {
   return (
     <Stack spacing={1} direction="row">
       <Switch
+        color={isDisabled ? 'warning' : 'primary'}
+        startDecorator={<SportsMartialArtsRounded />}
+        endDecorator={<AutoAwesome />}
         checked={!isDisabled}
         onChange={(e) => {
           if (!isAuthenticated) {
@@ -126,7 +134,7 @@ function Toggle({ chat }: ToggleProps) {
         arrow
         title={
           <Typography color="neutral">
-            Use this to tell your agent whether to respond to this chat or not.{" "}
+            Use this to tell your agent whether to automatically respond to this chat or not.{" "}
             <br />
             Must be{" "}
             <Link
