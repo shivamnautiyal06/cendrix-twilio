@@ -17,6 +17,7 @@ import {
   ArrowBackIosNewRounded,
   AutoAwesome,
   InfoOutlined,
+  LoopRounded,
   SportsMartialArtsRounded,
 } from "@mui/icons-material";
 
@@ -106,9 +107,10 @@ function Toggle({ chat }: ToggleProps) {
   return (
     <Stack spacing={1} direction="row">
       <Switch
-        color={isDisabled ? 'warning' : 'primary'}
+        disabled={!isAuthenticated}
+        color={isDisabled ? "warning" : "primary"}
         startDecorator={<SportsMartialArtsRounded />}
-        endDecorator={<AutoAwesome />}
+        endDecorator={<LoopRounded />}
         checked={!isDisabled}
         onChange={(e) => {
           if (!isAuthenticated) {
@@ -134,19 +136,23 @@ function Toggle({ chat }: ToggleProps) {
         arrow
         title={
           <Typography color="neutral">
-            Use this to tell your agent whether to automatically respond to this chat or not.{" "}
+            If you have a chatbot using Poku, use this to turn off/on its
+            automated responses.
             <br />
-            Must be{" "}
-            <Link
-              component="button"
-              onClick={() => {
-                navigate("/account");
-              }}
-            >
-              logged in
-            </Link>{" "}
-            to use.
-            <br />
+            {!isAuthenticated && (
+              <>
+                Must be{" "}
+                <Link
+                  component="button"
+                  onClick={() => {
+                    navigate("/account");
+                  }}
+                >
+                  logged in
+                </Link>{" "}
+                to use <br />
+              </>
+            )}
             Learn more in our{" "}
             <Link href={DOCS_LINK} target="_blank" rel="noopener noreferrer">
               docs

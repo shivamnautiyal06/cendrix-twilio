@@ -12,11 +12,7 @@ export default function MessageInput(props: MessageInputProps) {
   const textAreaRef = React.useRef<HTMLDivElement>(null);
   const handleClick = () => {
     if (textAreaValue.trim() !== "") {
-      try {
-        onSubmit(textAreaValue);
-      } catch (err) {
-        console.error("Failed to send message:", err);
-      }
+      void onSubmit(textAreaValue);
       setTextAreaValue("");
     }
   };
