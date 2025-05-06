@@ -47,7 +47,7 @@ export default function LlmKey() {
                 <br />
                 Your OpenAI API Key powers the decision engine behind message
                 flagging. It reads inbound/outbound messages and identifies ones
-                that match thte criteria you set below.
+                that match the criteria you set below.
               </Typography>
             }
           >

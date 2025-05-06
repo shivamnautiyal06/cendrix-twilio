@@ -17,7 +17,6 @@ import {
   ArrowBackIosNewRounded,
   AutoAwesome,
   InfoOutlined,
-  LoopRounded,
   SportsMartialArtsRounded,
 } from "@mui/icons-material";
 
@@ -109,8 +108,14 @@ function Toggle({ chat }: ToggleProps) {
       <Switch
         disabled={!isAuthenticated}
         color={isDisabled ? "warning" : "primary"}
-        startDecorator={<SportsMartialArtsRounded />}
-        endDecorator={<LoopRounded />}
+        startDecorator={
+          <SportsMartialArtsRounded
+            color={isDisabled ? "warning" : "inherit"}
+          />
+        }
+        endDecorator={
+          <AutoAwesome color={isDisabled ? "inherit" : "primary"} />
+        }
         checked={!isDisabled}
         onChange={(e) => {
           if (!isAuthenticated) {
@@ -136,8 +141,9 @@ function Toggle({ chat }: ToggleProps) {
         arrow
         title={
           <Typography color="neutral">
-            If you have a chatbot using Poku, use this to turn off/on its
-            automated responses.
+            If you have an AI agent that uses Poku, use this toggle to switch
+            between <Typography color="primary">AI mode</Typography> and{" "}
+            <Typography color="warning">human intervention mode</Typography>.
             <br />
             {!isAuthenticated && (
               <>
