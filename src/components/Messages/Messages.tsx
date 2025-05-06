@@ -36,8 +36,12 @@ function Messages() {
 
   React.useEffect(() => {
     const subId = eventEmitter.on("new-message", (msg) => {
-      const newMsgContactNumber =
-        msg.from === activePhoneNumber ? msg.to : msg.from;
+      const newMsgActivePhoneNumber = msg.direction === "received" ? msg.to : msg.from;
+      if (newMsgActivePhoneNumber !== activePhoneNumber) {
+        return;
+      }
+
+      const newMsgContactNumber = msg.direction === "received" ? msg.from : msg.to;
       const newMsgChatId = makeChatId(activePhoneNumber, newMsgContactNumber);
 
       setChats((prevChats) => {
