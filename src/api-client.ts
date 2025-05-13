@@ -29,12 +29,24 @@ class ApiClient {
     }
 
     async checkLlmKeyExists() {
-        return this.api.get("/account/llm");
+        return this.api.get("/account/keys/openai");
+    }
+
+    async checkVapiKeyExists() {
+        return this.api.get("/account/keys/vapi");
     }
 
     async createLlmKey(key: string) {
-        return this.api.post("/account/llm", {
-            llmKey: key,
+        return this.api.post("/account/keys", {
+            platform: "openai",
+            key: key,
+        });
+    }
+
+    async createVapiKey(key: string) {
+        return this.api.post("/account/keys", {
+            platform: "vapi",
+            key: key,
         });
     }
 

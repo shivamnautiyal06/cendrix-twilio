@@ -26,4 +26,4 @@ function Hitl() {
   );
 }
 
-export default withLoggedIn(Hitl);
+export default withLoggedIn(Hitl, "Human Intervention");

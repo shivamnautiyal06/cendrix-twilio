@@ -1,7 +1,7 @@
 import { Box, Tab, TabList, Tabs, tabClasses, TabPanel } from "@mui/joy";
 import Whatsapp from "./Whatsapp";
-import Webhooks from "./Webhooks";
 import TwilioForm from "./TwilioForm";
+import Vapi from "./Vapi";
 
 export default function WebhookIntegration() {
   return (
@@ -39,12 +39,9 @@ export default function WebhookIntegration() {
             <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={0}>
               Twilio
             </Tab>
-            <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={1}>
-              Whatsapp
+            <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={2}>
+              Vapi
             </Tab>
-            {/* <Tab sx={{ borderRadius: "6px 6px 0 0" }} indicatorInset value={2}>
-              Webhooks
-            </Tab> */}
           </TabList>
           <TabPanel value={0}>
             <Box
@@ -60,20 +57,6 @@ export default function WebhookIntegration() {
               <TwilioForm />
             </Box>
           </TabPanel>
-          <TabPanel value={1}>
-            <Box
-              sx={{
-                display: "flex",
-                marginTop: 5,
-                flexDirection: "column",
-                p: 2,
-                width: "100%",
-                maxWidth: 500,
-              }}
-            >
-              <Whatsapp />
-            </Box>
-          </TabPanel>
           <TabPanel value={2}>
             <Box
               sx={{
@@ -85,7 +68,7 @@ export default function WebhookIntegration() {
                 maxWidth: 500,
               }}
             >
-              <Webhooks />
+              <Vapi />
             </Box>
           </TabPanel>
         </Tabs>

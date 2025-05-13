@@ -36,13 +36,7 @@ export default function Account() {
           Account
         </Typography>
 
-        <Typography>
-          Some Poku features require an account to work:
-          <br />
-          &bull; Chat toggle
-          <br />
-          &bull; Flagging rules
-        </Typography>
+        <Typography>Some Poku features require an account to work.</Typography>
         <Login />
       </Card>
     </Box>
