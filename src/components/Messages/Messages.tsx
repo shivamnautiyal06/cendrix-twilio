@@ -35,7 +35,7 @@ function Messages() {
   });
 
   React.useEffect(() => {
-    const subId = eventEmitter.on("new-message", (msg) => {
+    const subId = eventEmitter.on("new-message", async (msg) => {
       const newMsgActivePhoneNumber =
         msg.direction === "received" ? msg.to : msg.from;
       if (newMsgActivePhoneNumber !== activePhoneNumber) {
@@ -46,17 +46,26 @@ function Messages() {
         msg.direction === "received" ? msg.from : msg.to;
       const newMsgChatId = makeChatId(activePhoneNumber, newMsgContactNumber);
 
+      const newChat: ChatInfo = {
+        chatId: newMsgChatId,
+        contactNumber: newMsgContactNumber,
+        hasUnread: true,
+        recentMsgContent: msg.content,
+        recentMsgDate: new Date(msg.timestamp),
+        recentMsgId: msg.id,
+      };
+
+      try {
+        const fcs = await apiClient.getFlaggedChats();
+        const [fc] = fcs.data.data.filter((e) => e.chatCode === newChat.chatId);
+        if (fc) {
+          newChat.isFlagged = fc.isFlagged;
+          newChat.flaggedReason = fc.flaggedReason;
+        }
+      } catch (err) {}
+
       setChats((prevChats) => {
         const index = prevChats.findIndex((c) => c.chatId === newMsgChatId);
-        const newChat: ChatInfo = {
-          chatId: newMsgChatId,
-          contactNumber: newMsgContactNumber,
-          hasUnread: true,
-          recentMsgContent: msg.content,
-          recentMsgDate: new Date(msg.timestamp),
-          recentMsgId: msg.id,
-        };
-
         if (index !== -1) {
           const updatedChats = [...prevChats];
           updatedChats[index] = {
@@ -83,7 +92,7 @@ function Messages() {
     return () => {
       eventEmitter.off(subId);
     };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, activePhoneNumber]);
 
   React.useEffect(() => {
     const fetchData = async () => {
