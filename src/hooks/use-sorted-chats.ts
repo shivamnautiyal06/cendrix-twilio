@@ -3,13 +3,15 @@ import type { ChatInfo } from "../types";
 
 function sortChats(chats: ChatInfo[]) {
     return chats.sort((a, b) => {
+        // Primary sort: isFlagged
         if (a.isFlagged && !b.isFlagged) {
             return -1;
         } else if (!a.isFlagged && b.isFlagged) {
             return 1;
-        } else {
-            return 0;
         }
+
+        // Secondary sort: recentMsgDate (descending)
+        return b.recentMsgDate.getTime() - a.recentMsgDate.getTime();
     });
 }
 
