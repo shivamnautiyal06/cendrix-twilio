@@ -116,6 +116,10 @@ class ApiClient {
             token: credentialResponse.credential,
         });
     }
+
+    async refresh() {
+        return this.api.post("/auth/refresh");
+    }
 }
 
 export const apiClient = new ApiClient();

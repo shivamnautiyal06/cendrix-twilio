@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import { storage } from "../storage";
+import { apiClient } from "../api-client";
 
 type User = {
   id: string;
@@ -39,13 +40,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   // Load from storage on boot
   useEffect(() => {
     const user = storage.getUser();
-
     if (user.idToken && user.id) {
       try {
         const { exp } = jwtDecode<{ exp: number }>(user.idToken);
-        if (Date.now() < exp * 1000) {
+        const expiresIn = exp * 1000 - Date.now();
+        if (expiresIn > 0) {
           setToken(user.idToken);
           setUser({ id: user.id, email: user.email, name: user.name });
+
+          // Refresh if less than 3 days remaining
+          if (expiresIn < 3 * 24 * 60 * 60 * 1000) {
+            apiClient.refresh().then((res) => {
+              if (res.data) {
+                login(res.data.accessToken, res.data.user);
+              }
+            });
+          }
+
+          // If user hasn't refreshed page, force logout
+          setTimeout(() => {
+            logout();
+          }, expiresIn);
         } else {
           logout();
         }
