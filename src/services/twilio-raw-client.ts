@@ -114,15 +114,18 @@ class Paginator {
             throw new Error("Reached the end of the iterator.");
         }
 
-        const res = await axios.get(this.nextPageUri, {
-            auth: {
-                username: this.sid,
-                password: this.authToken,
+        const res = await axios.get(
+            `https://api.twilio.com${this.nextPageUri}`,
+            {
+                auth: {
+                    username: this.sid,
+                    password: this.authToken,
+                },
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
             },
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        });
+        );
 
         return new Paginator(
             this.sid,
