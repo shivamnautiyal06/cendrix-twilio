@@ -100,6 +100,7 @@ function Messages() {
         if (fc) {
           newChat.isFlagged = fc.isFlagged;
           newChat.flaggedReason = fc.flaggedReason;
+          newChat.flaggedMessage = fc.flaggedMessage;
         }
       } catch (err) {}
 
