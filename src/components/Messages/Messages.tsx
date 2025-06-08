@@ -8,7 +8,7 @@ import { useAuthedCreds } from "../../context/CredentialsContext";
 import { makeChatId } from "../../utils";
 import withAuth from "../../context/withAuth";
 import { apiClient } from "../../api-client";
-import { useWebSocketEvent } from "../../hooks/use-websocket";
+import { useWebsocketEvents } from "../../hooks/use-websocket-events";
 import { useSortedChats } from "../../hooks/use-sorted-chats";
 
 import type { ChatInfo } from "../../types";
@@ -65,7 +65,7 @@ function Messages() {
     [chats, selectedChatId],
   );
 
-  useWebSocketEvent("flag-update", (payload) => {
+  useWebsocketEvents("flag-update", (payload) => {
     setChats((prevChats) => {
       return prevChats.map((c) =>
         c.chatId === payload.chatCode ? { ...c, ...payload } : c,
@@ -127,7 +127,7 @@ function Messages() {
     });
 
     // Ask for notification permission
-    window.Notification?.requestPermission();
+    // window.Notification?.requestPermission();
 
     const fetchInitialChats = async () => {
       const result = await fetchChatsHelper(

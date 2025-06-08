@@ -29,15 +29,15 @@ class ApiClient {
     }
 
     async checkTwilioCredsExist() {
-        return this.api.get<{hasKey: boolean;}>("/account/keys/twilio");
+        return this.api.get<{ hasKey: boolean }>("/account/keys/twilio");
     }
 
     async checkLlmKeyExists() {
-        return this.api.get<{hasKey: boolean;}>("/account/keys/openai");
+        return this.api.get<{ hasKey: boolean }>("/account/keys/openai");
     }
 
     async checkVapiKeyExists() {
-        return this.api.get<{hasKey: boolean;}>("/account/keys/vapi");
+        return this.api.get<{ hasKey: boolean }>("/account/keys/vapi");
     }
 
     async createLlmKey(key: string) {
@@ -62,15 +62,18 @@ class ApiClient {
         });
     }
 
-    async saveAccount(humanNumber: string, agentNumber: string) {
+    async saveAccount(humanNumber: string, agentNumber: string, waitTime: number) {
         return this.api.post("/account/hitl", {
             humanNumber: humanNumber,
             agentNumber: agentNumber,
+            waitTime: waitTime,
         });
     }
 
     async getAccount() {
-        return this.api.get<{humanNumber: string; agentNumber: string;} | undefined>("/account/hitl");
+        return this.api.get<
+            { humanNumber: string; agentNumber: string; waitTime: number; } | undefined
+        >("/account/hitl");
     }
 
     async getAgents() {

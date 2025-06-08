@@ -1,107 +1,57 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { useAuth } from "./AuthContext";
+// WebSocketProvider.tsx
+import { createContext, useContext } from "react";
+import useWebSocket, { ReadyState, SendMessage } from "react-use-websocket";
+import { useAuth } from "../context/AuthContext";
 
-type WebSocketContextType = {
-  socket: WebSocket | null;
-  isConnected: boolean;
-};
+type WSMessage = { type: string; payload: any };
 
-const WebSocketContext = createContext<WebSocketContextType>({
-  socket: null,
-  isConnected: false,
-});
+interface WebSocketContextValue {
+  sendJsonMessage: SendMessage;
+  lastJsonMessage: WSMessage | null;
+  readyState: ReadyState;
+}
 
-export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({
+const WebSocketContext = createContext<WebSocketContextValue | undefined>(
+  undefined,
+);
+
+export const WebsocketProvider = ({
   children,
+}: {
+  children: React.ReactNode;
 }) => {
   const { token, isAuthenticated } = useAuth();
-  const socketRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const url = import.meta.env.VITE_API_URL || "ws://localhost:3000";
 
-  const connect = () => {
-    disconnect();
-
-    if (!isAuthenticated || !token) {
-      // No auth, skipping connection
-      return;
-    }
-
-    const url = new URL(import.meta.env.VITE_API_URL || "ws://localhost:3000");
-    url.searchParams.set("token", token);
-
-    const ws = new WebSocket(url.toString());
-    socketRef.current = ws;
-
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-      setIsConnected(true);
-    };
-
-    // Can add global onMessage handling if needed
-    // ws.onmessage = (event) => {};
-
-    ws.onclose = (event) => {
-      console.warn("WebSocket closed", event.code, event.reason);
-      setIsConnected(false);
-      socketRef.current = null;
-      scheduleReconnect();
-    };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error", err);
-      ws.close();
-    };
-  };
-
-  const disconnect = () => {
-    if (reconnectTimeoutRef.current) {
-      clearTimeout(reconnectTimeoutRef.current);
-    }
-    if (socketRef.current) {
-      socketRef.current.close();
-      socketRef.current = null;
-    }
-    setIsConnected(false);
-  };
-
-  const scheduleReconnect = () => {
-    if (reconnectTimeoutRef.current) return; // already scheduled
-
-    console.log("Scheduling WebSocket reconnect in 3 seconds...");
-    reconnectTimeoutRef.current = setTimeout(() => {
-      reconnectTimeoutRef.current = null;
-      if (isAuthenticated && token) {
-        connect();
-      } else {
-        console.log("Skipping reconnect: not authenticated");
-      }
-    }, 3000);
-  };
-
-  useEffect(() => {
-    connect();
-
-    return () => {
-      disconnect();
-    };
-  }, [token, isAuthenticated]);
+  const { sendJsonMessage, lastJsonMessage, readyState } =
+    useWebSocket<WSMessage>(
+      url,
+      {
+        queryParams: { token: token! },
+        shouldReconnect: () => true,
+        reconnectInterval: 3000,
+        share: true,
+        onOpen: () => console.log("WebSocket connected"),
+        onClose: () => console.log("WebSocket disconnected"),
+        onError: (e) => console.error("WebSocket error", e),
+      },
+      isAuthenticated,
+    );
 
   return (
     <WebSocketContext.Provider
-      value={{ socket: socketRef.current, isConnected }}
+      value={{ sendJsonMessage, lastJsonMessage, readyState }}
     >
       {children}
     </WebSocketContext.Provider>
   );
 };
 
-export const useWebSocket = () => {
-  return useContext(WebSocketContext);
-};
+export function useWebsocketContext() {
+  const ctx = useContext(WebSocketContext);
+  if (!ctx)
+    throw new Error(
+      "useWebSocketContext must be used within WebSocketProvider",
+    );
+  return ctx;
+}

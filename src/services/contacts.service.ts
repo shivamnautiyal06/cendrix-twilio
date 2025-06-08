@@ -145,6 +145,12 @@ export class ContactsService {
         ]);
 
         this.paginators = { outbound, inbound };
+
+        // If no chats on this activeNumber
+        if (!outbound.items.length && !inbound.items.length) {
+            return [];
+        }
+
         this.globalEarliestEnder = this.getMostRecentMessage(
             inbound.items.at(-1),
             outbound.items.at(-1),

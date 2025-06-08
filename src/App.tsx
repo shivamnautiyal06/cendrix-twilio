@@ -12,14 +12,14 @@ import Account from "./components/Account/Account";
 import Hitl from "./components/Hitl/Hitl";
 import { CredentialsProvider } from "./context/CredentialsContext";
 import { AuthProvider } from "./context/AuthContext";
-import { WebSocketProvider } from "./context/WebsocketProvider";
+import { WebsocketProvider } from "./context/WebsocketProvider";
 
 export default function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
         <CredentialsProvider>
-          <WebSocketProvider>
+          <WebsocketProvider>
             <CssVarsProvider disableTransitionOnChange>
               <CssBaseline />
               <Router>
@@ -41,7 +41,7 @@ export default function App() {
                 </Pages>
               </Router>
             </CssVarsProvider>
-          </WebSocketProvider>
+          </WebsocketProvider>
         </CredentialsProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
