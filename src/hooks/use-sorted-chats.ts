@@ -1,6 +1,14 @@
 import { useState } from "react";
 import type { ChatInfo } from "../types";
 
+function shallowEqualChats(a: ChatInfo[], b: ChatInfo[]) {
+    return (
+        a.length === b.length &&
+        a.every((c, i) => c.chatId === b[i].chatId) &&
+        a.every((c, i) => c.isFlagged === b[i].isFlagged)
+    );
+}
+
 function sortChats(chats: ChatInfo[]) {
     return chats.sort((a, b) => {
         // Primary sort: isFlagged
@@ -24,7 +32,8 @@ export function useSortedChats(initialChats: ChatInfo[]) {
         setChats((prev) => {
             const updated =
                 typeof updater === "function" ? updater(prev) : updater;
-            return sortChats(updated);
+            const sorted = sortChats(updated);
+            return shallowEqualChats(prev, sorted) ? prev : sorted;
         });
     };
 

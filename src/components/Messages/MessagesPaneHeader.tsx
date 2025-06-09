@@ -98,10 +98,12 @@ function Toggle({ chat }: ToggleProps) {
     apiClient
       .getToggle(chat.chatId)
       .then((res) => {
-        setIsDisabled(res.data.isDisabled);
+        if (res.data.isDisabled !== isDisabled) {
+          setIsDisabled(res.data.isDisabled);
+        }
       })
       .catch((err) => console.error(err));
-  }, [chat]);
+  }, [chat.chatId]);
 
   return (
     <Stack spacing={1} direction="row">

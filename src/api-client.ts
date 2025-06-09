@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from "axios";
 import { storage } from "./storage";
 import type { CredentialResponse } from "@react-oauth/google";
 import type { MessageDirection } from "./types";
+import type { Recipient } from "./components/Campaigns/CsvUploader";
 
 class ApiClient {
     private api: AxiosInstance;
@@ -62,7 +63,11 @@ class ApiClient {
         });
     }
 
-    async saveAccount(humanNumber: string, agentNumber: string, waitTime: number) {
+    async saveAccount(
+        humanNumber: string,
+        agentNumber: string,
+        waitTime: number,
+    ) {
         return this.api.post("/account/hitl", {
             humanNumber: humanNumber,
             agentNumber: agentNumber,
@@ -72,7 +77,8 @@ class ApiClient {
 
     async getAccount() {
         return this.api.get<
-            { humanNumber: string; agentNumber: string; waitTime: number; } | undefined
+            | { humanNumber: string; agentNumber: string; waitTime: number }
+            | undefined
         >("/account/hitl");
     }
 
