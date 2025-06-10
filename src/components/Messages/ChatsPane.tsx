@@ -53,7 +53,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
   useEffect(() => {
     // Check if there are more chats to load
     setHasMoreChats(twilioClient.hasMoreChats());
-  }, [chats.length]);
+  }, [chats]);
 
   const handleLoadMore = async () => {
     if (hasMore) return;

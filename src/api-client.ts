@@ -2,7 +2,6 @@ import axios, { type AxiosInstance } from "axios";
 import { storage } from "./storage";
 import type { CredentialResponse } from "@react-oauth/google";
 import type { MessageDirection } from "./types";
-import type { Recipient } from "./components/Campaigns/CsvUploader";
 
 class ApiClient {
     private api: AxiosInstance;

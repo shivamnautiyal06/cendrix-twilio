@@ -95,14 +95,16 @@ function Toggle({ chat }: ToggleProps) {
       return;
     }
 
-    apiClient
-      .getToggle(chat.chatId)
-      .then((res) => {
-        if (res.data.isDisabled !== isDisabled) {
-          setIsDisabled(res.data.isDisabled);
-        }
-      })
-      .catch((err) => console.error(err));
+    const fetchData = async () => {
+      try {
+        const res = await apiClient.getToggle(chat.chatId);
+        setIsDisabled(res.data.isDisabled);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchData();
   }, [chat.chatId]);
 
   return (

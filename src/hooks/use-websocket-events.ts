@@ -12,5 +12,5 @@ export function useWebsocketEvents(
         if (lastJsonMessage?.type === eventName) {
             onUpdate(lastJsonMessage.payload);
         }
-    }, [lastJsonMessage, eventName, onUpdate]);
+    }, [lastJsonMessage]);
 }

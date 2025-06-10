@@ -13,141 +13,25 @@ import { useSortedChats } from "../../hooks/use-sorted-chats";
 
 import type { ChatInfo } from "../../types";
 import TwilioClient from "../../twilio-client";
+import { useEffect } from "react";
 
-// Helper function moved outside component to avoid recreating on each render
-const fetchChatsHelper = async (
-  twilioClient: TwilioClient,
-  activePhoneNumber: string,
-  chats: ChatInfo[],
-  loadMore = false,
-) => {
-  const [newChatsResult, flaggedChatsResult] = await Promise.allSettled([
-    twilioClient.getChats(activePhoneNumber, {
-      loadMore,
-      existingChatsId: chats.map((e) => e.chatId),
-    }),
-    apiClient.getFlaggedChats(),
-  ]);
-
-  if (newChatsResult.status === "fulfilled") {
-    const newChats = newChatsResult.value;
-
-    // Apply flag status to any new matched chats
-    if (flaggedChatsResult.status === "fulfilled") {
-      const flaggedChats = flaggedChatsResult.value.data.data;
-      for (const c of newChats) {
-        const found = flaggedChats.find((fc) => fc.chatCode === c.chatId);
-        if (found) {
-          c.isFlagged = found.isFlagged;
-          c.flaggedReason = found.flaggedReason;
-          c.flaggedMessage = found.flaggedMessage;
-        }
-      }
-    }
-
-    return { success: true, chats: newChats, loadMore };
-  } else {
-    console.error("Failed to fetch chats: ", newChatsResult.reason);
-    return { success: false };
-  }
-};
-
-function Messages() {
-  const { isAuthenticated, twilioClient, activePhoneNumber, eventEmitter } =
-    useAuthedCreds();
-  const [chats, setChats] = useSortedChats([]);
+function MessagesLayout(props: {
+  chats: ChatInfo[];
+  setChats: (
+    updater: ((prevChats: ChatInfo[]) => ChatInfo[]) | ChatInfo[],
+  ) => void;
+  activePhoneNumber: string;
+}) {
+  const { chats, setChats, activePhoneNumber } = props;
   const [selectedChatId, setSelectedChatId] = React.useState<string | null>(
     null,
   );
+  const { twilioClient } = useAuthedCreds();
 
   const selectedChat = React.useMemo(
     () => chats.find((c) => c.chatId === selectedChatId) ?? null,
     [chats, selectedChatId],
   );
-
-  useWebsocketEvents("flag-update", (payload) => {
-    setChats((prevChats) => {
-      return prevChats.map((c) =>
-        c.chatId === payload.chatCode ? { ...c, ...payload } : c,
-      );
-    });
-  });
-
-  React.useEffect(() => {
-    const subId = eventEmitter.on("new-message", async (msg) => {
-      const newMsgActivePhoneNumber =
-        msg.direction === "received" ? msg.to : msg.from;
-      if (newMsgActivePhoneNumber !== activePhoneNumber) {
-        return;
-      }
-
-      const newMsgContactNumber =
-        msg.direction === "received" ? msg.from : msg.to;
-      const newMsgChatId = makeChatId(activePhoneNumber, newMsgContactNumber);
-
-      const newChat: ChatInfo = {
-        chatId: newMsgChatId,
-        contactNumber: newMsgContactNumber,
-        hasUnread: true,
-        recentMsgContent: msg.content,
-        recentMsgDate: new Date(msg.timestamp),
-        recentMsgId: msg.id,
-      };
-
-      try {
-        const fcs = await apiClient.getFlaggedChats();
-        const [fc] = fcs.data.data.filter((e) => e.chatCode === newChat.chatId);
-        if (fc) {
-          newChat.isFlagged = fc.isFlagged;
-          newChat.flaggedReason = fc.flaggedReason;
-          newChat.flaggedMessage = fc.flaggedMessage;
-        }
-      } catch (err) {}
-
-      setChats((prevChats) => {
-        const index = prevChats.findIndex((c) => c.chatId === newMsgChatId);
-        if (index !== -1) {
-          const updatedChats = [...prevChats];
-          updatedChats[index] = {
-            ...updatedChats[index],
-            ...newChat,
-          };
-          return updatedChats;
-        } else {
-          return [...prevChats, newChat];
-        }
-      });
-
-      if (window.Notification?.permission === "granted") {
-        new Notification(`New message ${msg.direction}`, {
-          icon: "/logo.png",
-          body: msg.content,
-        });
-      }
-    });
-
-    // Ask for notification permission
-    // window.Notification?.requestPermission();
-
-    const fetchInitialChats = async () => {
-      const result = await fetchChatsHelper(
-        twilioClient,
-        activePhoneNumber,
-        chats,
-        false,
-      );
-      if (result.success && result.chats) {
-        setChats(result.chats);
-      }
-    };
-
-    fetchInitialChats();
-    setSelectedChatId(null);
-
-    return () => {
-      eventEmitter.off(subId);
-    };
-  }, [isAuthenticated, activePhoneNumber, twilioClient]);
 
   return (
     <Sheet
@@ -263,4 +147,155 @@ function Messages() {
   );
 }
 
-export default withAuth(Messages);
+export function useNewMessageListener(
+  activePhoneNumber: string,
+  setChats: (
+    updater: ((prevChats: ChatInfo[]) => ChatInfo[]) | ChatInfo[],
+  ) => void,
+) {
+  const { eventEmitter } = useAuthedCreds();
+
+  useEffect(() => {
+    const subId = eventEmitter.on("new-message", async (msg) => {
+      if (
+        (msg.direction === "received" ? msg.to : msg.from) !== activePhoneNumber
+      )
+        return;
+      const contactNumber = msg.direction === "received" ? msg.from : msg.to;
+      const chatId = makeChatId(activePhoneNumber, contactNumber);
+
+      const newChat: ChatInfo = {
+        chatId,
+        contactNumber,
+        hasUnread: true,
+        recentMsgContent: msg.content,
+        recentMsgDate: new Date(msg.timestamp),
+        recentMsgId: msg.id,
+      };
+
+      try {
+        const flagged = await apiClient.getFlaggedChats();
+        const match = flagged.data.data.find((e) => e.chatCode === chatId);
+        if (match) {
+          Object.assign(newChat, match);
+        }
+      } catch {}
+
+      setChats((prev) => {
+        const index = prev.findIndex((c) => c.chatId === chatId);
+        if (index >= 0) {
+          const updated = [...prev];
+          updated[index] = { ...updated[index], ...newChat };
+          return updated;
+        }
+        return [...prev, newChat];
+      });
+
+      if (window.Notification?.permission === "granted") {
+        new Notification(`New message`, {
+          body: msg.content,
+          icon: "/logo.png",
+        });
+      }
+
+      // Ask for notification permission
+      // window.Notification?.requestPermission();
+    });
+
+    return () => eventEmitter.off(subId);
+  }, [activePhoneNumber]);
+}
+
+export function useInitialChatsFetch(
+  activePhoneNumber: string,
+  setChats: (
+    updater: ((prevChats: ChatInfo[]) => ChatInfo[]) | ChatInfo[],
+  ) => void,
+) {
+  const { twilioClient } = useAuthedCreds();
+  useEffect(() => {
+    const load = async () => {
+      const result = await fetchChatsHelper(
+        twilioClient,
+        activePhoneNumber,
+        [],
+        false,
+      );
+      if (result.success && result.chats) {
+        setChats(result.chats);
+      }
+    };
+    load();
+  }, [twilioClient, activePhoneNumber]);
+}
+
+export function useSubscribeWsFlag(
+  setChats: (
+    updater: ((prevChats: ChatInfo[]) => ChatInfo[]) | ChatInfo[],
+  ) => void,
+) {
+  useWebsocketEvents("flag-update", (payload) => {
+    setChats((prevChats) => {
+      return prevChats.map((c) =>
+        c.chatId === payload.chatCode ? { ...c, ...payload } : c,
+      );
+    });
+  });
+}
+
+function MessagesContainer() {
+  const { activePhoneNumber } = useAuthedCreds();
+  const [chats, setChats] = useSortedChats([]);
+
+  useNewMessageListener(activePhoneNumber, setChats);
+  useInitialChatsFetch(activePhoneNumber, setChats);
+  useSubscribeWsFlag(setChats);
+
+  return (
+    <MessagesLayout
+      chats={chats}
+      setChats={setChats}
+      activePhoneNumber={activePhoneNumber}
+    />
+  );
+}
+
+// Helper function moved outside component to avoid recreating on each render
+async function fetchChatsHelper(
+  twilioClient: TwilioClient,
+  activePhoneNumber: string,
+  existingChats: ChatInfo[],
+  loadMore = false,
+) {
+  const [newChatsResult, flaggedChatsResult] = await Promise.allSettled([
+    twilioClient.getChats(activePhoneNumber, {
+      loadMore,
+      existingChatsId: existingChats.map((e) => e.chatId),
+    }),
+    apiClient.getFlaggedChats(),
+  ]);
+
+  if (newChatsResult.status === "fulfilled") {
+    const newChats = newChatsResult.value;
+
+    // Apply flag status to any new matched chats
+    if (flaggedChatsResult.status === "fulfilled") {
+      const flaggedChats = flaggedChatsResult.value.data.data;
+      for (const c of newChats) {
+        const found = flaggedChats.find((fc) => fc.chatCode === c.chatId);
+        if (found) {
+          c.isFlagged = found.isFlagged;
+          c.flaggedReason = found.flaggedReason;
+          c.flaggedMessage = found.flaggedMessage;
+        }
+      }
+    }
+
+    return { success: true, chats: newChats, loadMore };
+  } else {
+    console.error("Failed to fetch chats: ", newChatsResult.reason);
+    return { success: false };
+  }
+}
+
+export default withAuth(MessagesContainer);
