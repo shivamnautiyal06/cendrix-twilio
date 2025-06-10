@@ -107,7 +107,7 @@ function MessagesLayout(props: {
             setChats(result ? [result] : []);
           }}
           setSelectedChat={(chat) => {
-            setSelectedChatId(chat ? chat.chatId : chat);
+            setSelectedChatId(chat?.chatId ?? null);
             if (chat) {
               setChats((prevChats) =>
                 prevChats.map((c) =>
@@ -158,19 +158,19 @@ export function useNewMessageListener(
   useEffect(() => {
     const subId = eventEmitter.on("new-message", async (msg) => {
       if (
-        (msg.direction === "received" ? msg.to : msg.from) !== activePhoneNumber
+        (msg.direction === "inbound" ? msg.to : msg.from) !== activePhoneNumber
       )
         return;
-      const contactNumber = msg.direction === "received" ? msg.from : msg.to;
+      const contactNumber = msg.direction === "inbound" ? msg.from : msg.to;
       const chatId = makeChatId(activePhoneNumber, contactNumber);
 
       const newChat: ChatInfo = {
         chatId,
         contactNumber,
-        hasUnread: true,
         recentMsgContent: msg.content,
         recentMsgDate: new Date(msg.timestamp),
         recentMsgId: msg.id,
+        recentMsgDirection: msg.direction,
       };
 
       try {
@@ -185,9 +185,12 @@ export function useNewMessageListener(
         const index = prev.findIndex((c) => c.chatId === chatId);
         if (index >= 0) {
           const updated = [...prev];
+          newChat.hasUnread = msg.direction === "inbound" ? true : updated[index].hasUnread;
           updated[index] = { ...updated[index], ...newChat };
           return updated;
         }
+
+        newChat.hasUnread = msg.direction === "inbound" ? true : false;
         return [...prev, newChat];
       });
 
@@ -277,6 +280,12 @@ async function fetchChatsHelper(
 
   if (newChatsResult.status === "fulfilled") {
     const newChats = newChatsResult.value;
+
+    // Apply unread status
+    const unreads = await twilioClient.hasUnread(activePhoneNumber, newChats);
+    newChats.forEach((c, i) => {
+      c.hasUnread = unreads[i];
+    });
 
     // Apply flag status to any new matched chats
     if (flaggedChatsResult.status === "fulfilled") {
