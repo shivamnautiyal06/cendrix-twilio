@@ -39,7 +39,7 @@ export default function HumanAsATool() {
     <Stack spacing={1}>
       <Typography level="h4">Human in the Loop</Typography>
 
-      <Typography>Agent number:</Typography>
+      <Typography level="body-sm">Agent number:</Typography>
       {(phoneNumbers.length || whatsappNumbers.length) > 0 && (
         <Select
           placeholder="Choose a number"
@@ -54,13 +54,16 @@ export default function HumanAsATool() {
         </Select>
       )}
 
-      <Typography>Human number:</Typography>
+      <Typography level="body-sm">Human number:</Typography>
       <Input
         value={humanNumber}
         onChange={(e) => setHumanNumber(e.target.value || "")}
         placeholder="+12223334444"
       />
 
+      <Typography level="body-sm">
+        Set how long (in seconds) the agent holds for a human response:
+      </Typography>
       <Input
         type="number"
         value={waitTime}
