@@ -2,6 +2,7 @@ import axios, { type AxiosInstance } from "axios";
 import { storage } from "./storage";
 import type { CredentialResponse } from "@react-oauth/google";
 import type { MessageDirection } from "./types";
+import { Recipient } from "./components/Campaigns/CsvUploader";
 
 class ApiClient {
     private api: AxiosInstance;
@@ -150,6 +151,26 @@ class ApiClient {
 
     async refresh() {
         return this.api.post("/auth/refresh");
+    }
+
+    async createCampaign(
+        name: string,
+        template: string,
+        recipients: Recipient[],
+        senders: string[],
+        phoneNumberKey: string,
+    ) {
+        return this.api.post("/campaigns", {
+            name: name,
+            template: template,
+            recipients: recipients,
+            senders: senders,
+            phoneNumberKey: phoneNumberKey,
+        });
+    }
+
+    async getCampaigns() {
+        return this.api.get("/campaigns");
     }
 }
 
