@@ -11,19 +11,27 @@ function Campaigns() {
   const [creatingNew, setCreatingNew] = useState(false);
   const [propaganda, setPropaganda] = useState(false);
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        const res = await apiClient.getCampaigns();
-        setCampaigns(res.data);
-      } catch (err) {
-        if (err instanceof AxiosError && err.status === 401) {
-          setPropaganda(true);
-        }
+  const fetchCampaigns = async () => {
+    try {
+      const res = await apiClient.getCampaigns();
+      setCampaigns(res.data);
+    } catch (err) {
+      if (err instanceof AxiosError && err.status === 401) {
+        setPropaganda(true);
+      } else {
+        console.error(err);
       }
-    };
-    fetch();
+    }
+  };
+
+  useEffect(() => {
+    fetchCampaigns();
   }, []);
+
+  const handleCloseNewCampaign = () => {
+    setCreatingNew(false);
+    fetchCampaigns();
+  };
 
   if (propaganda) {
     return (
@@ -43,8 +51,8 @@ function Campaigns() {
 
       {creatingNew ? (
         <NewCampaign
-          onComplete={() => setCreatingNew(false)}
-          onCancel={() => setCreatingNew(false)}
+          onComplete={handleCloseNewCampaign}
+          onCancel={handleCloseNewCampaign}
         />
       ) : campaigns.length > 0 ? (
         <CampaignsTable campaigns={campaigns} />

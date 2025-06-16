@@ -15,8 +15,8 @@ export default function CampaignsTable({ campaigns }: { campaigns: any[] }) {
               <th>Created</th>
               <th>Name</th>
               <th>Status</th>
-              <th>Total</th>
-              <th>Sent</th>
+              <th>Queued</th>
+              <th>Delivered</th>
               <th>Failed</th>
               <th>Pending</th>
             </tr>
@@ -27,9 +27,11 @@ export default function CampaignsTable({ campaigns }: { campaigns: any[] }) {
                 <td>{displayDateTime(new Date(r.createdTime))}</td>
                 <td>{r.name}</td>
                 <td>{r.status}</td>
-                <td>{r.messageCount}</td>
                 <td>
-                  {r.sentMessages}/{r.messageCount}
+                  {r.queuedMessages}/{r.messageCount}
+                </td>
+                <td>
+                  {r.deliveredMessages}/{r.messageCount}
                 </td>
                 <td>
                   {r.failedMessages}/{r.messageCount}

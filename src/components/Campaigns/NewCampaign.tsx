@@ -10,6 +10,7 @@ import {
   Select,
   Option,
   Input,
+  Box,
 } from "@mui/joy";
 import { apiClient } from "../../api-client";
 import { useCredentials } from "../../context/CredentialsContext";
@@ -79,7 +80,10 @@ export default function NewCampaign({
       </Stack>
 
       <Stack gap={1}>
-        <Typography>Upload receipients list:</Typography>
+        <Box>
+          <Typography>Upload receipients list:</Typography>
+          <Typography level="body-sm">File must include phone numbers with format: +12223334444:</Typography>
+        </Box>
         <CsvUploader
           onRecipients={(data) => {
             setRecipients(data);
@@ -88,11 +92,14 @@ export default function NewCampaign({
         />
       </Stack>
 
-      <Textarea
-        minRows={3}
-        value={template}
-        onChange={(e) => setTemplate(e.target.value)}
-      />
+      <Stack gap={1}>
+      <Typography>Create message template:</Typography>
+        <Textarea
+          minRows={3}
+          value={template}
+          onChange={(e) => setTemplate(e.target.value)}
+        />
+      </Stack>
 
       <Select
         disabled={!recipients.length}
