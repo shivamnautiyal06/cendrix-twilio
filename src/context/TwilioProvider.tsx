@@ -6,7 +6,7 @@ import { storage } from "../storage";
 
 import type { WebhooksActivationStatus } from "../types";
 
-interface CredentialsContextType {
+interface TwilioContextType {
   sid: string;
   authToken: string;
   twilioClient: TwilioClient | null;
@@ -28,10 +28,10 @@ interface CredentialsContextType {
   setWhatsappNumbers: (numbers: string[]) => void;
 }
 
-const CredentialsContext = createContext<CredentialsContextType | null>(null);
+const TwilioContext = createContext<TwilioContextType | null>(null);
 
 export const useTwilio = () => {
-  const ctx = useContext(CredentialsContext);
+  const ctx = useContext(TwilioContext);
   if (!ctx)
     throw new Error("useCredentials must be used within CredentialsProvider");
   return ctx;
@@ -56,7 +56,7 @@ export const useAuthedTwilio = () => {
   };
 };
 
-export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
+export const TwilioProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [sid, setSid] = useState(storage.get("sid"));
@@ -124,7 +124,7 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   return (
-    <CredentialsContext.Provider
+    <TwilioContext.Provider
       value={{
         sid,
         authToken,
@@ -145,6 +145,6 @@ export const CredentialsProvider: React.FC<{ children: ReactNode }> = ({
       }}
     >
       {children}
-    </CredentialsContext.Provider>
+    </TwilioContext.Provider>
   );
 };

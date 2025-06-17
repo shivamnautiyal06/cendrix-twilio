@@ -4,6 +4,7 @@ import { Box, Card, Typography } from "@mui/joy";
 import { useAuth } from "../../context/AuthContext";
 import ApiKey from "./ApiKey";
 import { apiClient } from "../../api-client";
+import { useTwilio } from "../../context/TwilioProvider";
 
 export default function Account() {
   const { isAuthenticated } = useAuth();
@@ -45,6 +46,7 @@ export default function Account() {
 
 function Login() {
   const { login } = useAuth();
+  const { sid, authToken } = useTwilio();
 
   return (
     <>
@@ -57,6 +59,9 @@ function Login() {
             const res = await apiClient.login(credentialResponse);
             const { accessToken, user } = res.data;
             login(accessToken, user);
+            if (sid && authToken) {
+              await apiClient.createTwilioKey(sid, authToken);
+            }
           } catch (err) {
             console.error("Login failed:", err);
           }

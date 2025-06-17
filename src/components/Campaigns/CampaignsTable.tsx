@@ -16,9 +16,9 @@ export default function CampaignsTable({ campaigns }: { campaigns: any[] }) {
               <th>Name</th>
               <th>Status</th>
               <th>Queued</th>
-              <th>Delivered</th>
-              <th>Failed</th>
               <th>Pending</th>
+              <th>Failed</th>
+              <th>Delivered</th>
             </tr>
           </thead>
           <tbody>
@@ -31,13 +31,13 @@ export default function CampaignsTable({ campaigns }: { campaigns: any[] }) {
                   {r.queuedMessages}/{r.messageCount}
                 </td>
                 <td>
-                  {r.deliveredMessages}/{r.messageCount}
+                  {r.pendingMessages}/{r.messageCount}
                 </td>
                 <td>
                   {r.failedMessages}/{r.messageCount}
                 </td>
                 <td>
-                  {r.pendingMessages}/{r.messageCount}
+                  {r.deliveredMessages}/{r.messageCount}
                 </td>
               </tr>
             ))}

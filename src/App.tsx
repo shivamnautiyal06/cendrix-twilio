@@ -10,7 +10,7 @@ import Integrations from "./components/Integrations/Integrations";
 import Pages from "./components/Pages";
 import Account from "./components/Account/Account";
 import Hitl from "./components/Hitl/Hitl";
-import { CredentialsProvider } from "./context/TwilioProvider";
+import { TwilioProvider } from "./context/TwilioProvider";
 import { AuthProvider } from "./context/AuthContext";
 import { WebsocketProvider } from "./context/WebsocketProvider";
 import Campaigns from "./components/Campaigns/Campaigns";
@@ -19,7 +19,7 @@ export default function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
       <AuthProvider>
-        <CredentialsProvider>
+        <TwilioProvider>
           <WebsocketProvider>
             <CssVarsProvider disableTransitionOnChange>
               <CssBaseline />
@@ -44,7 +44,7 @@ export default function App() {
               </Router>
             </CssVarsProvider>
           </WebsocketProvider>
-        </CredentialsProvider>
+        </TwilioProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   );

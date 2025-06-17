@@ -4,6 +4,8 @@ import { Alert, Input, Button, Typography, Stack } from "@mui/joy";
 
 import { useTwilio } from "../../context/TwilioProvider";
 import Whatsapp from "./Whatsapp";
+import { useAuth } from "../../context/AuthContext";
+import { apiClient } from "../../api-client";
 
 export default function TwilioForm() {
   const {
@@ -13,6 +15,7 @@ export default function TwilioForm() {
     authToken: authTokenContext,
     isLoading,
   } = useTwilio();
+  const { isAuthenticated: isLoggedIn } = useAuth();
   const [sid, setSid] = React.useState(sidContext);
   const [authToken, setAuthToken] = React.useState(authTokenContext);
   const navigate = useNavigate();
@@ -20,6 +23,9 @@ export default function TwilioForm() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     const credsValid = await setCredentials(sid, authToken);
+    if (isLoggedIn) {
+      await apiClient.createTwilioKey(sid, authToken);
+    }
     if (credsValid) {
       navigate("/");
     }
@@ -35,7 +41,7 @@ export default function TwilioForm() {
       >
         <Typography level="h4">Twilio Credentials</Typography>
         <Alert variant="outlined" color="success">
-          Your credentials are safe, they never leave this browser. <br />
+          Your credentials are stored safely in this browser, or encrypted in our database if you're signed in.<br />
           You can check the code!
         </Alert>
 
