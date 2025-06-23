@@ -1,5 +1,16 @@
 import { useEffect, useState } from "react";
-import { Button, Typography, Input, Stack, Select, Option, Box, Radio, RadioGroup, LinearProgress } from "@mui/joy";
+import {
+  Button,
+  Typography,
+  Input,
+  Stack,
+  Select,
+  Option,
+  Box,
+  Radio,
+  RadioGroup,
+  LinearProgress,
+} from "@mui/joy";
 import { apiClient } from "../../api-client";
 import { useTwilio } from "../../context/TwilioProvider";
 
@@ -37,14 +48,22 @@ export default function HumanAsATool() {
   }, [phoneNumbers]);
 
   const handleSave = async () => {
-    await apiClient.saveAccount(humanNumber, usingHostedNumber ? hostedAgentNumber : agentNumber, waitTime, usingHostedNumber);
+    await apiClient.saveAccount(
+      humanNumber,
+      usingHostedNumber ? hostedAgentNumber : agentNumber,
+      waitTime,
+      usingHostedNumber,
+    );
     await apiClient.createTwilioKey(sid, authToken);
   };
 
   return (
     <Stack spacing={2}>
       <Typography level="h4">Human in the Loop</Typography>
-      <NumberType agentNumberSource={usingHostedNumber} setAgentNumberSource={setUsingHostedNumber} />
+      <NumberType
+        agentNumberSource={usingHostedNumber}
+        setAgentNumberSource={setUsingHostedNumber}
+      />
 
       {usingHostedNumber && (
         <Box>
@@ -52,14 +71,17 @@ export default function HumanAsATool() {
             Usage: {haatMessageCount} / {messageLimit}
           </Typography>
 
+          <LinearProgress
+            determinate
+            value={haatMessageCount * (100 / messageLimit)}
+          />
 
-          <LinearProgress determinate value={haatMessageCount * (100 / messageLimit)} />
-
-          <Typography sx={{mt: 1}} level="body-xs" color="warning">
-            ⚠️ 50 messages/month limit when using a free Poku number.  
+          <Typography sx={{ mt: 1 }} level="body-xs" color="warning">
+            ⚠️ 50 messages/month limit when using a free Poku number.
           </Typography>
           <Typography level="body-xs" color="warning">
-            To increase please contact us at <a href="mailto:hello@pokulabs.com">hello@pokulabs.com</a>
+            To increase please contact us at{" "}
+            <a href="mailto:hello@pokulabs.com">hello@pokulabs.com</a>
           </Typography>
         </Box>
       )}
@@ -72,7 +94,9 @@ export default function HumanAsATool() {
           <Select
             placeholder="Choose a number"
             value={agentNumber || ""}
-            onChange={(_event, newPhoneNumber) => setAgentNumber(newPhoneNumber!)}
+            onChange={(_event, newPhoneNumber) =>
+              setAgentNumber(newPhoneNumber!)
+            }
           >
             {phoneNumbers.concat(whatsappNumbers).map((e) => (
               <Option key={e} value={e}>
@@ -118,10 +142,12 @@ export default function HumanAsATool() {
   );
 }
 
-
-function NumberType(props: { agentNumberSource: boolean, setAgentNumberSource: React.Dispatch<React.SetStateAction<boolean>> }) {
+function NumberType(props: {
+  agentNumberSource: boolean;
+  setAgentNumberSource: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
       <RadioGroup
         orientation="horizontal"
         value={props.agentNumberSource}
@@ -130,21 +156,23 @@ function NumberType(props: { agentNumberSource: boolean, setAgentNumberSource: R
         }
         sx={{
           minHeight: 48,
-          padding: '6px',
-          borderRadius: '12px',
-          bgcolor: 'neutral.softBg',
-          '--RadioGroup-gap': '4px',
-          '--Radio-actionRadius': '8px',
+          padding: "6px",
+          borderRadius: "12px",
+          bgcolor: "neutral.softBg",
+          "--RadioGroup-gap": "4px",
+          "--Radio-actionRadius": "8px",
         }}
       >
-        {[{
-          value: true,
-          label: "Use Poku number"
-        },
-        {
-          value: false,
-          label: "Use own Twilio number"
-        }].map((item) => (
+        {[
+          {
+            value: true,
+            label: "Use Poku number",
+          },
+          {
+            value: false,
+            label: "Use own Twilio number",
+          },
+        ].map((item) => (
           <Radio
             key={item.value.toString()}
             color="neutral"
@@ -152,15 +180,15 @@ function NumberType(props: { agentNumberSource: boolean, setAgentNumberSource: R
             disableIcon
             label={item.label}
             variant="plain"
-            sx={{ px: 2, alignItems: 'center' }}
+            sx={{ px: 2, alignItems: "center" }}
             slotProps={{
               action: ({ checked }) => ({
                 sx: {
                   ...(checked && {
-                    bgcolor: 'background.surface',
-                    boxShadow: 'sm',
-                    '&:hover': {
-                      bgcolor: 'background.surface',
+                    bgcolor: "background.surface",
+                    boxShadow: "sm",
+                    "&:hover": {
+                      bgcolor: "background.surface",
                     },
                   }),
                 },

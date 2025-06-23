@@ -20,11 +20,14 @@ export default function MessagesPane(props: MessagesPaneProps) {
   React.useEffect(() => {
     const fetch = async () => {
       try {
-        const msgs = await twilioClient.getMessages(chat.activeNumber, chat.contactNumber);
+        const msgs = await twilioClient.getMessages(
+          chat.activeNumber,
+          chat.contactNumber,
+        );
         setChatMessages(msgs);
         twilioClient.updateMostRecentlySeenMessageId(chat.chatId, msgs);
       } catch (err) {
-        console.error("Failed to fetch chat messages:", err)
+        console.error("Failed to fetch chat messages:", err);
       }
     };
 

@@ -9,21 +9,20 @@ type MessagePaginator = Awaited<ReturnType<TwilioRawClient["getMessages"]>>;
 export type PaginationState = {
     paginators: { inbound: MessagePaginator; outbound: MessagePaginator };
     globalEarliestEnder: Date | undefined;
-}
+};
 
 export type GetChatsOptions = {
     existingChatsId?: string[];
     chatsPageSize?: number;
     filters?: Filters;
     paginationState?: PaginationState;
-}
+};
 
 export type Filters = {
     search?: string;
     onlyUnread?: boolean;
     activeNumber: string;
 };
-
 
 type GetChatsResult = {
     chats: ChatInfo[];
@@ -67,17 +66,17 @@ export class ContactsService {
 
     async getChats(
         activeNumber: string,
-        {
-            existingChatsId = [],
-            chatsPageSize = 10,
-            ...opts
-        }: GetChatsOptions,
+        { existingChatsId = [], chatsPageSize = 10, ...opts }: GetChatsOptions,
     ): Promise<GetChatsResult> {
         const chats = new Map<string, ChatInfo>();
         let isFirstRun = false;
 
-        let paginators = opts.paginationState ? opts.paginationState.paginators : undefined;
-        let globalEarliestEnder = opts.paginationState ? opts.paginationState.globalEarliestEnder : undefined;;
+        let paginators = opts.paginationState
+            ? opts.paginationState.paginators
+            : undefined;
+        let globalEarliestEnder = opts.paginationState
+            ? opts.paginationState.globalEarliestEnder
+            : undefined;
 
         // First-time call: initialize paginators
         if (!paginators || !globalEarliestEnder) {
@@ -94,8 +93,8 @@ export class ContactsService {
                     chats: [],
                     paginationState: {
                         paginators,
-                        globalEarliestEnder: undefined
-                    }
+                        globalEarliestEnder: undefined,
+                    },
                 };
             }
 
@@ -105,7 +104,7 @@ export class ContactsService {
                 outbound.items.at(-1),
             ).dateSent;
         }
-        
+
         while (chats.size < chatsPageSize) {
             let cutoffDate = this.getMostRecentMessage(
                 paginators.inbound.items.at(-1),
@@ -117,7 +116,7 @@ export class ContactsService {
                 paginators.outbound.items,
                 cutoffDate,
                 // Don't filter for before on firstRun
-                isFirstRun ? new Date() : globalEarliestEnder
+                isFirstRun ? new Date() : globalEarliestEnder,
             );
 
             // If no messages to process and no more pages, break out
@@ -155,24 +154,34 @@ export class ContactsService {
             globalEarliestEnder = cutoffDate;
 
             [paginators.outbound, paginators.inbound] = await Promise.all([
-                this.tryAdvancePaginator(paginators.inbound, globalEarliestEnder),
-                this.tryAdvancePaginator(paginators.outbound, globalEarliestEnder),
+                this.tryAdvancePaginator(
+                    paginators.inbound,
+                    globalEarliestEnder,
+                ),
+                this.tryAdvancePaginator(
+                    paginators.outbound,
+                    globalEarliestEnder,
+                ),
             ]);
 
             isFirstRun = false;
         }
 
-        return { chats: [...chats.values()], paginationState: {
-            paginators,
-            globalEarliestEnder,
-        }};
+        return {
+            chats: [...chats.values()],
+            paginationState: {
+                paginators,
+                globalEarliestEnder,
+            },
+        };
     }
 
     hasMoreChats(state: PaginationState | undefined) {
-        if (!state || !state.paginators || !state.globalEarliestEnder) return false;
+        if (!state || !state.paginators || !state.globalEarliestEnder)
+            return false;
 
         const { inbound, outbound } = state.paginators;
-    
+
         let cutoffDate = this.getMostRecentMessage(
             inbound.items.at(-1),
             outbound.items.at(-1),
@@ -222,10 +231,11 @@ export class ContactsService {
         );
     }
 
-    private async removeUnread(activeNumber: string, chats: Map<string, ChatInfo>) {
-        const unread = await this.hasUnread(activeNumber, [
-            ...chats.values(),
-        ]);
+    private async removeUnread(
+        activeNumber: string,
+        chats: Map<string, ChatInfo>,
+    ) {
+        const unread = await this.hasUnread(activeNumber, [...chats.values()]);
         [...chats.values()].forEach((c, i) => {
             if (!unread[i]) {
                 chats.delete(c.chatId);
@@ -294,12 +304,14 @@ export class ContactsService {
         return result;
     }
 
-    private async tryAdvancePaginator(paginator: MessagePaginator, globalEarliestEnder: Date) {
+    private async tryAdvancePaginator(
+        paginator: MessagePaginator,
+        globalEarliestEnder: Date,
+    ) {
         const lastMessage = paginator.items.at(-1);
         if (
             !lastMessage ||
-            globalEarliestEnder?.getTime() !==
-                lastMessage.dateSent.getTime()
+            globalEarliestEnder?.getTime() !== lastMessage.dateSent.getTime()
         ) {
             return paginator;
         }

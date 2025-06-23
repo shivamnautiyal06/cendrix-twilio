@@ -1,4 +1,12 @@
-import { Box, Tab, tabClasses, TabList, TabPanel, Tabs, Typography } from "@mui/joy";
+import {
+  Box,
+  Tab,
+  tabClasses,
+  TabList,
+  TabPanel,
+  Tabs,
+  Typography,
+} from "@mui/joy";
 
 import LlmKey from "./LlmKey";
 import DecisionAgent from "./Agent";
@@ -7,7 +15,6 @@ import HumanAsATool from "./HumanAsATool";
 
 function Hitl() {
   return (
-
     <Box sx={{ flex: 1, width: "100%" }}>
       <Box
         sx={{
@@ -79,7 +86,8 @@ function Hitl() {
                 }}
               >
                 <Typography>
-                  Automatically flag messages for review based on your own rules.
+                  Automatically flag messages for review based on your own
+                  rules.
                 </Typography>
                 <LlmKey />
                 <DecisionAgent />

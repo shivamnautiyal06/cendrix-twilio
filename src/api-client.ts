@@ -79,7 +79,13 @@ class ApiClient {
 
     async getAccount() {
         return this.api.get<
-            | { humanNumber: string; agentNumber: string; waitTime: number; usingHostedNumber: boolean; haatMessageCount: number; }
+            | {
+                  humanNumber: string;
+                  agentNumber: string;
+                  waitTime: number;
+                  usingHostedNumber: boolean;
+                  haatMessageCount: number;
+              }
             | undefined
         >("/account/hitl");
     }

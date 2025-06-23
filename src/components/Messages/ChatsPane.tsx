@@ -36,7 +36,6 @@ import { apiClient } from "../../api-client";
 import { useInitialChatsFetch } from "../../hooks/use-initial-chats-fetch";
 import { useNewMessageListener } from "../../hooks/use-new-message-listener";
 
-
 export default function ChatsPane(props: {
   chats: ChatInfo[];
   selectedChatId?: string;
@@ -54,15 +53,20 @@ export default function ChatsPane(props: {
     onUpdateFilters,
   } = props;
 
-  const { twilioClient, phoneNumbers, whatsappNumbers } =
-    useAuthedTwilio();
+  const { twilioClient, phoneNumbers, whatsappNumbers } = useAuthedTwilio();
   const [hasMoreLoading, setHasMoreLoading] = useState(false);
   const [hasMoreChats, setHasMoreChats] = useState(false);
-  
-  const [paginationState, setPaginationState] = useState<PaginationState | undefined>(undefined);
+
+  const [paginationState, setPaginationState] = useState<
+    PaginationState | undefined
+  >(undefined);
 
   useNewMessageListener(filters.activeNumber, onUpdateChats);
-  const { isLoading } = useInitialChatsFetch(filters, onUpdateChats, setPaginationState);
+  const { isLoading } = useInitialChatsFetch(
+    filters,
+    onUpdateChats,
+    setPaginationState,
+  );
 
   useEffect(() => {
     // Check if there are more chats to load
@@ -172,7 +176,10 @@ export default function ChatsPane(props: {
           value={filters.activeNumber}
           onChange={(_event, newPhoneNumber) => {
             if (!newPhoneNumber) return;
-            onUpdateFilters(prev => ({ ...prev, activeNumber: newPhoneNumber }))
+            onUpdateFilters((prev) => ({
+              ...prev,
+              activeNumber: newPhoneNumber,
+            }));
           }}
         >
           {phoneNumbers.concat(whatsappNumbers).map((e) => {
@@ -185,9 +192,14 @@ export default function ChatsPane(props: {
         </Select>
         <Stack direction="row" spacing={1}>
           <SearchContact onUpdateFilters={onUpdateFilters} />
-          <MessageFilter onChange={(filters => {
-            onUpdateFilters(prev => ({ ...prev, onlyUnread: filters.onlyUnread }));
-          })} />
+          <MessageFilter
+            onChange={(filters) => {
+              onUpdateFilters((prev) => ({
+                ...prev,
+                onlyUnread: filters.onlyUnread,
+              }));
+            }}
+          />
         </Stack>
       </Stack>
       <List
@@ -203,23 +215,25 @@ export default function ChatsPane(props: {
           <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
             <CircularProgress />
           </Box>
-        ) : chats.map((chat) => (
-          <ChatListItem
-            key={chat.chatId}
-            chat={chat}
-            onChatSelected={(chat => {
-              if (!chat) return;
-              // Mark chat as read
-              onUpdateChats((prevChats) =>
-                prevChats.map((c) =>
-                  c.chatId === chat.chatId ? { ...c, hasUnread: false } : c,
-                ),
-              );
-              onChatSelected(chat);
-            })}
-            isSelected={selectedChatId === chat.chatId}
-          />
-        ))}
+        ) : (
+          chats.map((chat) => (
+            <ChatListItem
+              key={chat.chatId}
+              chat={chat}
+              onChatSelected={(chat) => {
+                if (!chat) return;
+                // Mark chat as read
+                onUpdateChats((prevChats) =>
+                  prevChats.map((c) =>
+                    c.chatId === chat.chatId ? { ...c, hasUnread: false } : c,
+                  ),
+                );
+                onChatSelected(chat);
+              }}
+              isSelected={selectedChatId === chat.chatId}
+            />
+          ))
+        )}
 
         {hasMoreChats && !filters.search && !isLoading && (
           <ListItem sx={{ justifyContent: "center", py: 2 }}>
@@ -229,7 +243,9 @@ export default function ChatsPane(props: {
               size="sm"
               disabled={hasMoreLoading}
               onClick={handleLoadMore}
-              startDecorator={hasMoreLoading ? <CircularProgress size="sm" /> : null}
+              startDecorator={
+                hasMoreLoading ? <CircularProgress size="sm" /> : null
+              }
             >
               {hasMoreLoading ? "Loading..." : "Load More"}
             </Button>
@@ -255,14 +271,14 @@ function SearchContact(props: {
       value={inputValue}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
-          onUpdateFilters(prev => ({ ...prev, search: inputValue }));
+          onUpdateFilters((prev) => ({ ...prev, search: inputValue }));
         }
       }}
       startDecorator={
         <IconButton
           size="sm"
           onClick={() => {
-            onUpdateFilters(prev => ({ ...prev, search: undefined }));
+            onUpdateFilters((prev) => ({ ...prev, search: undefined }));
           }}
         >
           <CloseRounded />
@@ -272,7 +288,7 @@ function SearchContact(props: {
         <IconButton
           variant="soft"
           onClick={() => {
-            onUpdateFilters(prev => ({ ...prev, search: inputValue }));
+            onUpdateFilters((prev) => ({ ...prev, search: inputValue }));
           }}
           disabled={!inputValue?.trim()}
         >
@@ -319,7 +335,6 @@ function MessageFilter(props: {
     </Dropdown>
   );
 }
-
 
 export async function fetchChatsHelper(
   twilioClient: TwilioClient,

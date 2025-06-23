@@ -15,7 +15,9 @@ import { useAuthedTwilio } from "../../context/TwilioProvider";
 function MessagesLayout() {
   const { phoneNumbers, twilioClient } = useAuthedTwilio();
   const [selectedChat, setSelectedChat] = useState<ChatInfo | null>(null);
-  const [filters, setFilters] = useState<Filters>({ activeNumber: phoneNumbers[0] });
+  const [filters, setFilters] = useState<Filters>({
+    activeNumber: phoneNumbers[0],
+  });
   const [chats, setChats] = useSortedChats([]);
 
   useSubscribeWsFlag(setChats);
@@ -31,14 +33,13 @@ function MessagesLayout() {
         onUpdateFilters={setFilters}
       />
       {selectedChat ? (
-        <MessagesPane
-          chat={selectedChat}
-        />
+        <MessagesPane chat={selectedChat} />
       ) : (
         <NewMessagesPane
           callback={(activeNumber, contactNumber) => {
-            twilioClient.getChat(activeNumber, contactNumber)
-            .then(res => setSelectedChat(res ?? null));
+            twilioClient
+              .getChat(activeNumber, contactNumber)
+              .then((res) => setSelectedChat(res ?? null));
           }}
           activePhoneNumber={filters.activeNumber}
         />

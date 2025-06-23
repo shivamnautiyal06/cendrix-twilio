@@ -36,7 +36,9 @@ export default function NewMessagePaneHeader(props: MessagesPaneHeaderProps) {
         >
           <ArrowBackIosNewRounded />
         </IconButton>
-        <Typography level="body-md" sx={{ p: 1 }}><b>From:</b> {activeNumber}</Typography>
+        <Typography level="body-md" sx={{ p: 1 }}>
+          <b>From:</b> {activeNumber}
+        </Typography>
         <Input
           placeholder="+12223334444"
           onChange={(e) => setContactNumber(e.target.value)}
