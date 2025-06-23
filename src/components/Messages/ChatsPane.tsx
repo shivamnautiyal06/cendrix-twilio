@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   IconButton,
   Input,
@@ -15,6 +15,8 @@ import {
   Checkbox,
   Dropdown,
   MenuButton,
+  Badge,
+  Box,
 } from "@mui/joy";
 import {
   EditNoteRounded,
@@ -28,71 +30,91 @@ import { toggleMessagesPane } from "../../utils";
 import { useAuthedTwilio } from "../../context/TwilioProvider";
 
 import type { ChatInfo } from "../../types";
+import { Filters, PaginationState } from "../../services/contacts.service";
+import TwilioClient from "../../twilio-client";
+import { apiClient } from "../../api-client";
+import { useInitialChatsFetch } from "../../hooks/use-initial-chats-fetch";
+import { useNewMessageListener } from "../../hooks/use-new-message-listener";
 
-type ChatsPaneProps = {
-  activePhoneNumber: string;
+
+export default function ChatsPane(props: {
   chats: ChatInfo[];
-  setSelectedChat: (chat: ChatInfo | null) => void;
-  selectedChatId: string | null;
-  onLoadMore: () => Promise<void>;
-  onSearchFilterChange: (contactNumber: string) => void;
-  onMessageFilterChange: (filters: { onlyUnread: boolean }) => void;
-};
-
-export default function ChatsPane(props: ChatsPaneProps) {
+  selectedChatId?: string;
+  onChatSelected: React.Dispatch<React.SetStateAction<ChatInfo | null>>;
+  onUpdateChats: React.Dispatch<React.SetStateAction<ChatInfo[]>>;
+  filters: Filters;
+  onUpdateFilters: React.Dispatch<React.SetStateAction<Filters>>;
+}) {
   const {
     chats,
-    setSelectedChat,
     selectedChatId,
-    activePhoneNumber,
-    onLoadMore,
-    onSearchFilterChange,
-    onMessageFilterChange,
+    onChatSelected,
+    onUpdateChats,
+    filters,
+    onUpdateFilters,
   } = props;
 
-  const { twilioClient, phoneNumbers, setActivePhoneNumber, whatsappNumbers } =
+  const { twilioClient, phoneNumbers, whatsappNumbers } =
     useAuthedTwilio();
-  const [contactsFilter, setContactsFilter] = useState("");
-  const [hasMore, setHasMore] = useState(false);
+  const [hasMoreLoading, setHasMoreLoading] = useState(false);
   const [hasMoreChats, setHasMoreChats] = useState(false);
-  const [isSearching, setIsSearching] = useState(false);
+  
+  const [paginationState, setPaginationState] = useState<PaginationState | undefined>(undefined);
+
+  useNewMessageListener(filters.activeNumber, onUpdateChats);
+  const { isLoading } = useInitialChatsFetch(filters, onUpdateChats, setPaginationState);
 
   useEffect(() => {
     // Check if there are more chats to load
-    setHasMoreChats(twilioClient.hasMoreChats());
-  }, [chats]);
+    setHasMoreChats(twilioClient.hasMoreChats(paginationState));
+  }, [chats, paginationState]);
 
   const handleLoadMore = async () => {
-    if (hasMore) return;
+    if (hasMoreLoading) return;
 
-    setHasMore(true);
+    setHasMoreLoading(true);
     try {
-      await onLoadMore();
+      const newChats = await fetchChatsHelper(
+        twilioClient,
+        chats,
+        paginationState,
+        filters,
+      );
+      setPaginationState(newChats.paginationState);
+      onUpdateChats((prevChats) => {
+        const chatMap = new Map<string, ChatInfo>();
+        prevChats.forEach((chat) => chatMap.set(chat.chatId, chat));
+        newChats.chats.forEach((chat) => {
+          if (!chatMap.has(chat.chatId)) {
+            chatMap.set(chat.chatId, chat);
+          }
+        });
+        return Array.from(chatMap.values());
+      });
     } finally {
-      setHasMore(false);
-    }
-  };
-
-  const handleSearch = async () => {
-    if (!contactsFilter.trim() || isSearching) return;
-
-    setIsSearching(true);
-    try {
-      onSearchFilterChange(contactsFilter);
-    } catch (err) {
-      console.error("Search failed:", err);
-    } finally {
-      setIsSearching(false);
+      setHasMoreLoading(false);
     }
   };
 
   return (
     <Sheet
       sx={{
+        position: { xs: "fixed", sm: "sticky" },
+        transform: {
+          xs: "translateX(calc(-100% * (var(--MessagesPane-slideIn, 0))))",
+          sm: "none",
+        },
+        transition: "transform 0.4s, width 0.4s",
+        zIndex: 100,
+        width: "100%",
+        top: 52,
+        height: { xs: "calc(100dvh - 52px)", sm: "100dvh" }, // Need this line
+        overflow: "hidden", // block parent scrolling
+
         borderRight: "1px solid",
         borderColor: "divider",
         // height: { sm: "calc(100dvh - var(--Header-height))", md: "100dvh" },
-        height: "100%", // or `calc(100dvh - HEADER_HEIGHT)` if needed
+        // height: "100%", // or `calc(100dvh - HEADER_HEIGHT)` if needed
         display: "flex",
         flexDirection: "column",
       }}
@@ -123,7 +145,7 @@ export default function ChatsPane(props: ChatsPaneProps) {
           aria-label="edit"
           color="neutral"
           onClick={() => {
-            setSelectedChat(null);
+            onChatSelected(null);
             if (window.innerWidth < 600) {
               // Approximate `xs` breakpoint
               toggleMessagesPane();
@@ -147,10 +169,11 @@ export default function ChatsPane(props: ChatsPaneProps) {
       </Stack>
       <Stack sx={{ px: 2, pb: 1.5 }} spacing={1}>
         <Select
-          value={activePhoneNumber}
-          onChange={(_event, newPhoneNumber) =>
-            setActivePhoneNumber(newPhoneNumber!)
-          }
+          value={filters.activeNumber}
+          onChange={(_event, newPhoneNumber) => {
+            if (!newPhoneNumber) return;
+            onUpdateFilters(prev => ({ ...prev, activeNumber: newPhoneNumber }))
+          }}
         >
           {phoneNumbers.concat(whatsappNumbers).map((e) => {
             return (
@@ -161,47 +184,10 @@ export default function ChatsPane(props: ChatsPaneProps) {
           })}
         </Select>
         <Stack direction="row" spacing={1}>
-          <Input
-            sx={{ flex: 1 }}
-            onChange={(event) => {
-              setContactsFilter(event.target.value);
-              if (!event.target.value) {
-                onSearchFilterChange("");
-              }
-            }}
-            value={contactsFilter}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleSearch();
-              }
-            }}
-            startDecorator={
-              <IconButton
-                size="sm"
-                onClick={() => {
-                  setContactsFilter("");
-                  onSearchFilterChange("");
-                }}
-              >
-                <CloseRounded />
-              </IconButton>
-            }
-            endDecorator={
-              <IconButton
-                variant="soft"
-                onClick={handleSearch}
-                disabled={isSearching || !contactsFilter.trim()}
-              >
-                {isSearching ? (
-                  <CircularProgress size="sm" />
-                ) : (
-                  <SearchRounded />
-                )}
-              </IconButton>
-            }
-            placeholder="Search for chat"
-          />
-          <MessageFilter onChange={onMessageFilterChange} />
+          <SearchContact onUpdateFilters={onUpdateFilters} />
+          <MessageFilter onChange={(filters => {
+            onUpdateFilters(prev => ({ ...prev, onlyUnread: filters.onlyUnread }));
+          })} />
         </Stack>
       </Stack>
       <List
@@ -213,26 +199,39 @@ export default function ChatsPane(props: ChatsPaneProps) {
           "--ListItem-paddingX": "1rem",
         }}
       >
-        {chats.map((chat) => (
+        {isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+            <CircularProgress />
+          </Box>
+        ) : chats.map((chat) => (
           <ChatListItem
             key={chat.chatId}
             chat={chat}
-            setSelectedChat={setSelectedChat}
+            onChatSelected={(chat => {
+              if (!chat) return;
+              // Mark chat as read
+              onUpdateChats((prevChats) =>
+                prevChats.map((c) =>
+                  c.chatId === chat.chatId ? { ...c, hasUnread: false } : c,
+                ),
+              );
+              onChatSelected(chat);
+            })}
             isSelected={selectedChatId === chat.chatId}
           />
         ))}
 
-        {hasMoreChats && !contactsFilter && (
+        {hasMoreChats && !filters.search && !isLoading && (
           <ListItem sx={{ justifyContent: "center", py: 2 }}>
             <Button
               variant="outlined"
               color="neutral"
               size="sm"
-              disabled={hasMore}
+              disabled={hasMoreLoading}
               onClick={handleLoadMore}
-              startDecorator={hasMore ? <CircularProgress size="sm" /> : null}
+              startDecorator={hasMoreLoading ? <CircularProgress size="sm" /> : null}
             >
-              {hasMore ? "Loading..." : "Load More"}
+              {hasMoreLoading ? "Loading..." : "Load More"}
             </Button>
           </ListItem>
         )}
@@ -241,17 +240,62 @@ export default function ChatsPane(props: ChatsPaneProps) {
   );
 }
 
-type MessageFilterProps = {
-  onChange: (filters: { onlyUnread: boolean }) => void;
-};
+function SearchContact(props: {
+  onUpdateFilters: React.Dispatch<React.SetStateAction<Filters>>;
+}) {
+  const { onUpdateFilters } = props;
+  const [inputValue, setInputValue] = React.useState("");
 
-function MessageFilter({ onChange }: MessageFilterProps) {
+  return (
+    <Input
+      sx={{ flex: 1 }}
+      onChange={(event) => {
+        setInputValue(event.target.value);
+      }}
+      value={inputValue}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          onUpdateFilters(prev => ({ ...prev, search: inputValue }));
+        }
+      }}
+      startDecorator={
+        <IconButton
+          size="sm"
+          onClick={() => {
+            onUpdateFilters(prev => ({ ...prev, search: undefined }));
+          }}
+        >
+          <CloseRounded />
+        </IconButton>
+      }
+      endDecorator={
+        <IconButton
+          variant="soft"
+          onClick={() => {
+            onUpdateFilters(prev => ({ ...prev, search: inputValue }));
+          }}
+          disabled={!inputValue?.trim()}
+        >
+          <SearchRounded />
+        </IconButton>
+      }
+      placeholder="Search for chat"
+    />
+  );
+}
+
+function MessageFilter(props: {
+  onChange: (filters: { onlyUnread: boolean }) => void;
+}) {
+  const { onChange } = props;
   const [onlyUnread, setOnlyUnread] = useState(false);
 
   return (
     <Dropdown>
       <MenuButton slots={{ root: IconButton }}>
-        <FilterAltOutlined />
+        <Badge invisible={!onlyUnread}>
+          <FilterAltOutlined />
+        </Badge>
       </MenuButton>
       <Menu
         sx={{
@@ -274,4 +318,51 @@ function MessageFilter({ onChange }: MessageFilterProps) {
       </Menu>
     </Dropdown>
   );
+}
+
+
+export async function fetchChatsHelper(
+  twilioClient: TwilioClient,
+  existingChats: ChatInfo[],
+  paginationState: PaginationState | undefined,
+  filters: Filters,
+) {
+  const [newChatsResult, flaggedChatsResult] = await Promise.allSettled([
+    twilioClient.getChats(filters.activeNumber, {
+      paginationState,
+      filters,
+      existingChatsId: existingChats.map((e) => e.chatId),
+    }),
+    apiClient.getFlaggedChats(),
+  ]);
+
+  if (newChatsResult.status === "rejected") {
+    console.error("Failed to fetch chats: ", newChatsResult.reason);
+    return { chats: existingChats };
+  }
+
+  const { chats: newChats } = newChatsResult.value;
+
+  // Apply unread status
+  const unreads = await twilioClient.hasUnread(filters.activeNumber, newChats);
+  newChats.forEach((c, i) => {
+    c.hasUnread = unreads[i];
+  });
+
+  if (flaggedChatsResult.status === "rejected") {
+    return newChatsResult.value;
+  }
+
+  // Apply flag status to any new matched chats
+  const flaggedChats = flaggedChatsResult.value.data.data;
+  for (const c of newChats) {
+    const found = flaggedChats.find((fc) => fc.chatCode === c.chatId);
+    if (found) {
+      c.isFlagged = found.isFlagged;
+      c.flaggedReason = found.flaggedReason;
+      c.flaggedMessage = found.flaggedMessage;
+    }
+  }
+
+  return newChatsResult.value;
 }
