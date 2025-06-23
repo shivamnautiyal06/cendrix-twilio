@@ -5,9 +5,7 @@ import Typography from "@mui/joy/Typography";
 import type { PlainMessage } from "../../types";
 import { displayDateTime } from "../../utils";
 
-type ChatBubbleProps = PlainMessage;
-
-export default function ChatBubble(props: ChatBubbleProps) {
+export default function ChatBubble(props: PlainMessage) {
   const { content, timestamp, direction, status } = props;
   const isSent = direction === "outbound";
   return (
@@ -30,39 +28,27 @@ export default function ChatBubble(props: ChatBubbleProps) {
               p: 1.25,
               borderRadius: "lg",
             },
-            isSent
-              ? {
-                  borderTopRightRadius: 0,
-                }
-              : {
-                  borderTopRightRadius: "lg",
-                },
-            isSent
-              ? {
-                  borderTopLeftRadius: "lg",
-                }
-              : {
-                  borderTopLeftRadius: 0,
-                },
-            isSent
-              ? {
-                  backgroundColor: "var(--joy-palette-primary-solidBg)",
-                }
-              : {
-                  backgroundColor: "background.body",
-                },
+            {
+              borderTopRightRadius: isSent ? 0 : "lg",
+            },
+            {
+              borderTopLeftRadius: isSent ? "lg" : 0,
+            },
+            {
+              backgroundColor: isSent
+                ? "var(--joy-palette-primary-solidBg)"
+                : "background.body",
+            },
           ]}
         >
           <Typography
             level="body-sm"
             sx={[
-              isSent
-                ? {
-                    color: "var(--joy-palette-common-white)",
-                  }
-                : {
-                    color: "var(--joy-palette-text-primary)",
-                  },
+              {
+                color: isSent
+                  ? "var(--joy-palette-common-white)"
+                  : "var(--joy-palette-text-primary)",
+              },
               !["delivered", "received", "read"].includes(status)
                 ? {
                     color: "var(--joy-palette-danger-400)",

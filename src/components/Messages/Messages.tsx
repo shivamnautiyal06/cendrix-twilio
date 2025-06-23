@@ -9,7 +9,7 @@ import { useWebsocketEvents } from "../../hooks/use-websocket-events";
 import { useSortedChats } from "../../hooks/use-sorted-chats";
 
 import type { ChatInfo } from "../../types";
-import { Filters } from "../../services/contacts.service";
+import { Filters } from "../../services/chats.service";
 import { useAuthedTwilio } from "../../context/TwilioProvider";
 
 function MessagesLayout() {

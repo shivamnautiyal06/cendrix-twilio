@@ -30,7 +30,7 @@ import { toggleMessagesPane } from "../../utils";
 import { useAuthedTwilio } from "../../context/TwilioProvider";
 
 import type { ChatInfo } from "../../types";
-import { Filters, PaginationState } from "../../services/contacts.service";
+import { Filters, PaginationState } from "../../services/chats.service";
 import TwilioClient from "../../twilio-client";
 import { apiClient } from "../../api-client";
 import { useInitialChatsFetch } from "../../hooks/use-initial-chats-fetch";
@@ -55,8 +55,6 @@ export default function ChatsPane(props: {
 
   const { twilioClient, phoneNumbers, whatsappNumbers } = useAuthedTwilio();
   const [hasMoreLoading, setHasMoreLoading] = useState(false);
-  const [hasMoreChats, setHasMoreChats] = useState(false);
-
   const [paginationState, setPaginationState] = useState<
     PaginationState | undefined
   >(undefined);
@@ -67,11 +65,6 @@ export default function ChatsPane(props: {
     onUpdateChats,
     setPaginationState,
   );
-
-  useEffect(() => {
-    // Check if there are more chats to load
-    setHasMoreChats(twilioClient.hasMoreChats(paginationState));
-  }, [chats, paginationState]);
 
   const handleLoadMore = async () => {
     if (hasMoreLoading) return;
@@ -235,7 +228,7 @@ export default function ChatsPane(props: {
           ))
         )}
 
-        {hasMoreChats && !filters.search && !isLoading && (
+        {paginationState?.hasMore && !filters.search && !isLoading && (
           <ListItem sx={{ justifyContent: "center", py: 2 }}>
             <Button
               variant="outlined"

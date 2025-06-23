@@ -1,9 +1,8 @@
 import { MessagesService } from "./services/messages.service";
 import {
     ContactsService,
-    type PaginationState,
     type GetChatsOptions,
-} from "./services/contacts.service";
+} from "./services/chats.service";
 import { PhoneNumbersService } from "./services/phone-numbers.service";
 import TwilioRawClient from "./services/twilio-raw-client";
 import type { ChatInfo, PlainMessage } from "./types";
@@ -53,10 +52,6 @@ class TwilioClient {
 
     async getChats(activeNumber: string, opts: GetChatsOptions) {
         return this.contactsService.getChats(activeNumber, opts);
-    }
-
-    hasMoreChats(state: PaginationState | undefined) {
-        return this.contactsService.hasMoreChats(state);
     }
 
     async getMessages(activeNumber: string, contactNumber: string) {

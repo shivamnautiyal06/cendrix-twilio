@@ -9,6 +9,7 @@ type MessagePaginator = Awaited<ReturnType<TwilioRawClient["getMessages"]>>;
 export type PaginationState = {
     paginators: { inbound: MessagePaginator; outbound: MessagePaginator };
     globalEarliestEnder: Date | undefined;
+    hasMore: boolean;
 };
 
 export type GetChatsOptions = {
@@ -94,6 +95,7 @@ export class ContactsService {
                     paginationState: {
                         paginators,
                         globalEarliestEnder: undefined,
+                        hasMore: false,
                     },
                 };
             }
@@ -172,15 +174,18 @@ export class ContactsService {
             paginationState: {
                 paginators,
                 globalEarliestEnder,
+                hasMore: this.hasMoreChats(paginators, globalEarliestEnder),
             },
         };
     }
 
-    hasMoreChats(state: PaginationState | undefined) {
-        if (!state || !state.paginators || !state.globalEarliestEnder)
-            return false;
+    private hasMoreChats(
+        paginators: PaginationState["paginators"] | undefined,
+        globalEarliestEnder: Date | undefined,
+    ) {
+        if (!paginators || !globalEarliestEnder) return false;
 
-        const { inbound, outbound } = state.paginators;
+        const { inbound, outbound } = paginators;
 
         let cutoffDate = this.getMostRecentMessage(
             inbound.items.at(-1),
@@ -188,7 +193,7 @@ export class ContactsService {
         ).dateSent;
 
         return !!(
-            cutoffDate.getTime() !== state.globalEarliestEnder.getTime() ||
+            cutoffDate.getTime() !== globalEarliestEnder.getTime() ||
             inbound.hasNextPage() ||
             outbound.hasNextPage()
         );

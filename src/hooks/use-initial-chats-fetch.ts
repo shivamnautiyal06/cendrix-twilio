@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useAuthedTwilio } from "../context/TwilioProvider";
-import { Filters, PaginationState } from "../services/contacts.service";
+import { Filters, PaginationState } from "../services/chats.service";
 import { ChatInfo } from "../types";
 import { fetchChatsHelper } from "../components/Messages/ChatsPane";
 
