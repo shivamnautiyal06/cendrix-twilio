@@ -23,6 +23,7 @@ export default function HumanAsATool() {
   const [waitTime, setWaitTime] = useState<number>(60);
   const [usingHostedNumber, setUsingHostedNumber] = useState(true);
   const [haatMessageCount, setHaatMessageCount] = useState(0);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,13 +49,22 @@ export default function HumanAsATool() {
   }, [phoneNumbers]);
 
   const handleSave = async () => {
-    await apiClient.saveAccount(
-      humanNumber,
-      usingHostedNumber ? hostedAgentNumber : agentNumber,
-      waitTime,
-      usingHostedNumber,
-    );
-    await apiClient.createTwilioKey(sid, authToken);
+    setSaveStatus("saving");
+    try {
+      await apiClient.saveAccount(
+        humanNumber,
+        usingHostedNumber ? hostedAgentNumber : agentNumber,
+        waitTime,
+        usingHostedNumber,
+      );
+      await apiClient.createTwilioKey(sid, authToken);
+      setSaveStatus("success");
+      setTimeout(() => setSaveStatus("idle"), 2000); // hide message after 2s
+    } catch (err) {
+      console.error(err);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus("idle"), 4000);
+    }
   };
 
   return (
@@ -134,10 +144,10 @@ export default function HumanAsATool() {
 
       <Button
         onClick={handleSave}
-        disabled={!humanNumber || !agentNumber || !sid || !authToken}
-      >
-        Save
-      </Button>
+        disabled={!humanNumber || !agentNumber || !sid || !authToken || saveStatus === "saving"}
+      >Save</Button>
+      {saveStatus === "success" && <Typography color="success">Settings saved!</Typography>}
+      {saveStatus === "error" && <Typography color="danger">Failed to save settings.</Typography>}
     </Stack>
   );
 }
