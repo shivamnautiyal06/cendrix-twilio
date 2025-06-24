@@ -80,10 +80,12 @@ export default function HumanAsATool() {
       </Box>
 
       <Stack spacing={1}>
-        <Typography level="h4">Agent Number</Typography>
-        <Typography level="body-sm">
-          The number your agent will reach out from
-        </Typography>
+        <Box>
+          <Typography level="h4">Agent Number</Typography>
+          <Typography level="body-sm">
+            The number your agent will reach out from
+          </Typography>
+        </Box>
         <NumberType
           agentNumberSource={usingHostedNumber}
           setAgentNumberSource={setUsingHostedNumber}
@@ -144,7 +146,7 @@ export default function HumanAsATool() {
       <Box>
         <Typography level="h4">Wait Time</Typography>
         <Typography level="body-sm">
-          How long (in seconds) the agent will wait for a human response:
+          How long (in seconds) the agent will wait for a human response
         </Typography>
         <Input
           type="number"
