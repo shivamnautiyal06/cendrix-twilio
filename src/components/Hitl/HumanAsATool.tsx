@@ -19,11 +19,13 @@ export default function HumanAsATool() {
   const [humanNumber, setHumanNumber] = useState("");
   const [agentNumber, setAgentNumber] = useState("");
   const [hostedAgentNumber, setHostedAgentNumber] = useState("+16286001841");
-  const [messageLimit, setMessageLimit] = useState(50);
-  const [waitTime, setWaitTime] = useState<number>(60);
+  const [waitTime, setWaitTime] = useState(60);
   const [usingHostedNumber, setUsingHostedNumber] = useState(true);
   const [haatMessageCount, setHaatMessageCount] = useState(0);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "success" | "error">("idle");
+  const [haatMessageLimit, setHaatMessageLimit] = useState(0);
+  const [saveStatus, setSaveStatus] = useState<
+    "idle" | "saving" | "success" | "error"
+  >("idle");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +37,7 @@ export default function HumanAsATool() {
           setWaitTime(res.data.waitTime || 60);
           setUsingHostedNumber(res.data.usingHostedNumber ?? true);
           setHaatMessageCount(res.data.haatMessageCount);
+          setHaatMessageLimit(res.data.haatMessageLimit);
         }
 
         const twilioCredsExist = await apiClient.checkTwilioCredsExist();
@@ -68,38 +71,24 @@ export default function HumanAsATool() {
   };
 
   return (
-    <Stack spacing={2}>
-      <Typography level="h4">Human in the Loop</Typography>
-      <NumberType
-        agentNumberSource={usingHostedNumber}
-        setAgentNumberSource={setUsingHostedNumber}
-      />
-
-      {usingHostedNumber && (
-        <Box>
-          <Typography level="body-sm">
-            Usage: {haatMessageCount} / {messageLimit}
-          </Typography>
-
-          <LinearProgress
-            determinate
-            value={haatMessageCount * (100 / messageLimit)}
-          />
-
-          <Typography sx={{ mt: 1 }} level="body-xs" color="warning">
-            ⚠️ 50 messages/month limit when using a free Poku number.
-          </Typography>
-          <Typography level="body-xs" color="warning">
-            To increase please contact us at{" "}
-            <a href="mailto:hello@pokulabs.com">hello@pokulabs.com</a>
-          </Typography>
-        </Box>
-      )}
-
+    <Stack spacing={3}>
       <Box>
-        <Typography level="body-sm">
-          Agent number: the number your agent will reach out from
+        <Typography>
+          Enable your AI agent to loop in a human for help via SMS.
         </Typography>
+        {/* <Typography>Learn more here</Typography> */}
+      </Box>
+
+      <Stack spacing={1}>
+        <Typography level="h4">Agent Number</Typography>
+        <Typography level="body-sm">
+          The number your agent will reach out from
+        </Typography>
+        <NumberType
+          agentNumberSource={usingHostedNumber}
+          setAgentNumberSource={setUsingHostedNumber}
+        />
+
         {!usingHostedNumber ? (
           <Select
             placeholder="Choose a number"
@@ -117,11 +106,33 @@ export default function HumanAsATool() {
         ) : (
           <Input disabled={true} value={hostedAgentNumber} />
         )}
-      </Box>
+
+        {usingHostedNumber && (
+          <Box>
+            <Typography level="body-sm">
+              Usage: {haatMessageCount} / {haatMessageLimit}
+            </Typography>
+
+            <LinearProgress
+              determinate
+              value={haatMessageCount * (100 / haatMessageLimit)}
+            />
+
+            <Typography sx={{ mt: 1 }} level="body-xs" color="warning">
+              ⚠️ {haatMessageLimit} messages/month limit when using a free Poku number.
+            </Typography>
+            <Typography level="body-xs" color="warning">
+              To increase please contact us at{" "}
+              <a href="mailto:hello@pokulabs.com">hello@pokulabs.com</a>
+            </Typography>
+          </Box>
+        )}
+      </Stack>
 
       <Box>
+        <Typography level="h4">Human Number</Typography>
         <Typography level="body-sm">
-          Human number: the number your agent will contact
+          The number your agent will contact
         </Typography>
         <Input
           value={humanNumber}
@@ -131,9 +142,9 @@ export default function HumanAsATool() {
       </Box>
 
       <Box>
+        <Typography level="h4">Wait Time</Typography>
         <Typography level="body-sm">
-          Wait time: how long (in seconds) the agent will wait for a human
-          response:
+          How long (in seconds) the agent will wait for a human response:
         </Typography>
         <Input
           type="number"
@@ -144,10 +155,22 @@ export default function HumanAsATool() {
 
       <Button
         onClick={handleSave}
-        disabled={!humanNumber || !agentNumber || !sid || !authToken || saveStatus === "saving"}
-      >Save</Button>
-      {saveStatus === "success" && <Typography color="success">Settings saved!</Typography>}
-      {saveStatus === "error" && <Typography color="danger">Failed to save settings.</Typography>}
+        disabled={
+          !humanNumber ||
+          !agentNumber ||
+          !sid ||
+          !authToken ||
+          saveStatus === "saving"
+        }
+      >
+        Save
+      </Button>
+      {saveStatus === "success" && (
+        <Typography color="success">Settings saved!</Typography>
+      )}
+      {saveStatus === "error" && (
+        <Typography color="danger">Failed to save settings.</Typography>
+      )}
     </Stack>
   );
 }
@@ -157,7 +180,7 @@ function NumberType(props: {
   setAgentNumberSource: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
-    <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+    <Box sx={{ display: "flex", gap: 2 }}>
       <RadioGroup
         orientation="horizontal"
         value={props.agentNumberSource}
@@ -165,6 +188,7 @@ function NumberType(props: {
           props.setAgentNumberSource(event.target.value === "true")
         }
         sx={{
+          width: "100%",
           minHeight: 48,
           padding: "6px",
           borderRadius: "12px",
@@ -176,11 +200,11 @@ function NumberType(props: {
         {[
           {
             value: true,
-            label: "Use Poku number",
+            label: "Free Poku number",
           },
           {
             value: false,
-            label: "Use own Twilio number",
+            label: "Your Twilio number",
           },
         ].map((item) => (
           <Radio
@@ -190,7 +214,13 @@ function NumberType(props: {
             disableIcon
             label={item.label}
             variant="plain"
-            sx={{ px: 2, alignItems: "center" }}
+            sx={{
+              px: 2,
+              alignItems: "center",
+              flex: 1,
+              justifyContent: "center",
+              textAlign: "center",
+            }}
             slotProps={{
               action: ({ checked }) => ({
                 sx: {
@@ -201,6 +231,11 @@ function NumberType(props: {
                       bgcolor: "background.surface",
                     },
                   }),
+                },
+              }),
+              label: ({ checked }) => ({
+                sx: {
+                  fontWeight: checked ? "bold" : "normal",
                 },
               }),
             }}

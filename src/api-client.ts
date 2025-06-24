@@ -85,6 +85,7 @@ class ApiClient {
                   waitTime: number;
                   usingHostedNumber: boolean;
                   haatMessageCount: number;
+                  haatMessageLimit: number;
               }
             | undefined
         >("/account/hitl");

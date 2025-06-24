@@ -4,6 +4,7 @@ import Sheet from "@mui/joy/Sheet";
 import Typography from "@mui/joy/Typography";
 import type { PlainMessage } from "../../types";
 import { displayDateTime } from "../../utils";
+import React from "react";
 
 export default function ChatBubble(props: PlainMessage) {
   const { content, timestamp, direction, status } = props;
@@ -59,7 +60,12 @@ export default function ChatBubble(props: PlainMessage) {
               },
             ]}
           >
-            {content}
+            {content.split("\n").map((line, idx) => (
+              <React.Fragment key={idx}>
+                {line}
+                <br />
+              </React.Fragment>
+            ))}
           </Typography>
         </Sheet>
       </Box>
