@@ -10,6 +10,7 @@ import {
   Radio,
   RadioGroup,
   LinearProgress,
+  Link
 } from "@mui/joy";
 import { apiClient } from "../../api-client";
 import { useTwilio } from "../../context/TwilioProvider";
@@ -76,7 +77,7 @@ export default function HumanAsATool() {
         <Typography>
           Enable your AI agent to loop in a human for help via SMS.
         </Typography>
-        {/* <Typography>Learn more here</Typography> */}
+        <Typography>Learn more <Link href="https://docs.google.com/presentation/d/1PMpEqUr7KLtKtcKFnwFGmj_yTf4-D3BwpWkIU9AmiJs/edit?slide=id.g36abfac4763_0_32#slide=id.g36abfac4763_0_32" target="_blank" rel="noopener noreferrer">here</Link>.</Typography>
       </Box>
 
       <Stack spacing={1}>

@@ -1,5 +1,6 @@
 import {
   Box,
+  Link,
   Tab,
   tabClasses,
   TabList,
@@ -85,10 +86,13 @@ function Hitl() {
                   gap: 2,
                 }}
               >
-                <Typography>
-                  Automatically flag messages for review based on your own
-                  rules.
-                </Typography>
+                <Box>
+                  <Typography>
+                    Automatically flag messages for review based on your own
+                    rules.
+                  </Typography>
+                  <Typography>Learn more <Link href="https://docs.google.com/presentation/d/1PMpEqUr7KLtKtcKFnwFGmj_yTf4-D3BwpWkIU9AmiJs/edit?slide=id.g36abfac4763_0_47#slide=id.g36abfac4763_0_47" target="_blank" rel="noopener noreferrer">here</Link>.</Typography>
+                </Box>
                 <LlmKey />
                 <DecisionAgent />
               </Box>
