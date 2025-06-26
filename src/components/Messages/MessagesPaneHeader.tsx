@@ -164,7 +164,11 @@ function Toggle({ chat }: ToggleProps) {
               </>
             )}
             Learn more{" "}
-            <Link href="https://docs.google.com/presentation/d/1PMpEqUr7KLtKtcKFnwFGmj_yTf4-D3BwpWkIU9AmiJs/edit?slide=id.g36abfac4763_0_100#slide=id.g36abfac4763_0_100" target="_blank" rel="noopener noreferrer">
+            <Link
+              href="https://docs.google.com/presentation/d/1PMpEqUr7KLtKtcKFnwFGmj_yTf4-D3BwpWkIU9AmiJs/edit?slide=id.g36abfac4763_0_100#slide=id.g36abfac4763_0_100"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               here
             </Link>
             .

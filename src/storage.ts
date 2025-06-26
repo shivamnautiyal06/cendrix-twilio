@@ -111,11 +111,13 @@ class Storage {
     }
 
     getUser() {
-        const oidcStorage = localStorage.getItem(`oidc.user:${import.meta.env.VITE_AUTHORITY_URL}:${import.meta.env.VITE_CLIENT_ID}`);
+        const oidcStorage = localStorage.getItem(
+            `oidc.user:${import.meta.env.VITE_AUTHORITY_URL}:${import.meta.env.VITE_CLIENT_ID}`,
+        );
         if (!oidcStorage) {
             return null;
         }
-    
+
         return User.fromStorageString(oidcStorage);
     }
 }

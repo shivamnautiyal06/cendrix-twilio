@@ -25,8 +25,7 @@ const withLoggedIn = <P extends object>(
             maxWidth: 400,
           }}
         >
-          <Card sx={{ pb: 5 }} >
-
+          <Card sx={{ pb: 5 }}>
             <Alert
               variant="outlined"
               color="warning"

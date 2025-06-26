@@ -10,11 +10,14 @@ export type Recipient = {
 };
 
 type Props = {
-  onRecipients: (recipients: Recipient[], likelyPhoneNumberHeader?: string) => void;
+  onRecipients: (
+    recipients: Recipient[],
+    likelyPhoneNumberHeader?: string,
+  ) => void;
 };
 
 function findLikelyPhoneNumberHeader(datum: Recipient) {
-  return Object.keys(datum).find(key => isPossiblePhoneNumber(datum[key]));
+  return Object.keys(datum).find((key) => isPossiblePhoneNumber(datum[key]));
 }
 
 export default function CsvUploader(props: Props) {

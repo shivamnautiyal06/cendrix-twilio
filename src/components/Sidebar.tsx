@@ -229,7 +229,9 @@ export default function Sidebar() {
           <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
             <Box sx={{ minWidth: 0, flex: 1 }}>
               <Typography level="title-sm">Logged in</Typography>
-              <Typography level="body-xs">{user?.profile.preferred_username}</Typography>
+              <Typography level="body-xs">
+                {user?.profile.preferred_username}
+              </Typography>
             </Box>
             <IconButton
               title="Logout"

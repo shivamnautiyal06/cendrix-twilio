@@ -34,10 +34,20 @@ function Vapi() {
     <Stack spacing={1}>
       <Box>
         <Typography>
-          This integration lets your Vapi agent receive messages while on a phone
-          call, such as texts.
+          This integration lets your Vapi agent receive messages while on a
+          phone call, such as texts.
         </Typography>
-        <Typography>Learn more <Link href="https://docs.google.com/presentation/d/1PMpEqUr7KLtKtcKFnwFGmj_yTf4-D3BwpWkIU9AmiJs/edit?slide=id.g36ac38dd284_0_77#slide=id.g36ac38dd284_0_77" target="_blank" rel="noopener noreferrer">here</Link>.</Typography>
+        <Typography>
+          Learn more{" "}
+          <Link
+            href="https://docs.google.com/presentation/d/1PMpEqUr7KLtKtcKFnwFGmj_yTf4-D3BwpWkIU9AmiJs/edit?slide=id.g36ac38dd284_0_77#slide=id.g36ac38dd284_0_77"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            here
+          </Link>
+          .
+        </Typography>
       </Box>
       <Typography
         level="h4"

@@ -107,7 +107,9 @@ export default function NewCampaign({
       </Stack>
 
       <Stack gap={1}>
-        <Typography>Select the recipient <b>phone number</b> header:</Typography>
+        <Typography>
+          Select the recipient <b>phone number</b> header:
+        </Typography>
         <Select
           disabled={!recipients.length}
           placeholder="Select header"
