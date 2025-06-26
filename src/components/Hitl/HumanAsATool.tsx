@@ -107,7 +107,7 @@ export default function HumanAsATool() {
             ))}
           </Select>
         ) : (
-          <Input disabled={true} value={hostedAgentNumber} />
+          <Input disabled={true} value={`Poku's agent number: ` + hostedAgentNumber} />
         )}
 
         {usingHostedNumber && (
