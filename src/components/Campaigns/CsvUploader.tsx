@@ -3,14 +3,19 @@ import Papa from "papaparse";
 import { Stack, Typography, Sheet, IconButton, Box } from "@mui/joy";
 import Dropzone from "react-dropzone";
 import { UploadFileRounded } from "@mui/icons-material";
+import { isPossiblePhoneNumber } from "libphonenumber-js";
 
 export type Recipient = {
   [index: string]: any;
 };
 
 type Props = {
-  onRecipients: (recipients: Recipient[]) => void;
+  onRecipients: (recipients: Recipient[], likelyPhoneNumberHeader?: string) => void;
 };
+
+function findLikelyPhoneNumberHeader(datum: Recipient) {
+  return Object.keys(datum).find(key => isPossiblePhoneNumber(datum[key]));
+}
 
 export default function CsvUploader(props: Props) {
   const { onRecipients } = props;
@@ -24,7 +29,7 @@ export default function CsvUploader(props: Props) {
       worker: true,
       complete: (result) => {
         const data = result.data as Recipient[];
-        onRecipients(data);
+        onRecipients(data, findLikelyPhoneNumberHeader(data[0]));
       },
       error: () => setError("Failed to parse CSV"),
     });

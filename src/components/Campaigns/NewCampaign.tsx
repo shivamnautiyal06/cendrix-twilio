@@ -87,9 +87,12 @@ export default function NewCampaign({
           </Typography>
         </Box>
         <CsvUploader
-          onRecipients={(data) => {
+          onRecipients={(data, likelyPhoneNumberHeader) => {
             setRecipients(data);
             setHeaders(Object.keys(data[0]));
+            if (likelyPhoneNumberHeader) {
+              setPhoneNumberHeader(likelyPhoneNumberHeader);
+            }
           }}
         />
       </Stack>
@@ -103,20 +106,23 @@ export default function NewCampaign({
         />
       </Stack>
 
-      <Select
-        disabled={!recipients.length}
-        placeholder="Select the phone number column"
-        value={phoneNumberHeader}
-        onChange={(_event, newPhoneNumber) =>
-          setPhoneNumberHeader(newPhoneNumber!)
-        }
-      >
-        {headers.map((e) => (
-          <Option key={e} value={e}>
-            {e}
-          </Option>
-        ))}
-      </Select>
+      <Stack gap={1}>
+        <Typography>Select the recipient <b>phone number</b> header:</Typography>
+        <Select
+          disabled={!recipients.length}
+          placeholder="Select header"
+          value={phoneNumberHeader}
+          onChange={(_event, newPhoneNumber) =>
+            setPhoneNumberHeader(newPhoneNumber!)
+          }
+        >
+          {headers.map((e) => (
+            <Option key={e} value={e}>
+              {e}
+            </Option>
+          ))}
+        </Select>
+      </Stack>
 
       {recipients.length > 0 && (
         <>
