@@ -175,8 +175,8 @@ export default function HumanAsATool() {
         disabled={
           !humanNumber ||
           !agentNumber ||
-          !sid ||
-          !authToken ||
+          (!sid && !usingHostedNumber) ||
+          (!authToken && !usingHostedNumber) ||
           saveStatus === "saving"
         }
       >
