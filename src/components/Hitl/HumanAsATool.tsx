@@ -43,6 +43,7 @@ export default function HumanAsATool() {
 
         const twilioCredsExist = await apiClient.checkTwilioCredsExist();
         if (twilioCredsExist.data.hasKey) {
+          // TODO
         }
       } catch (err) {
         console.error(err);
@@ -61,7 +62,9 @@ export default function HumanAsATool() {
         waitTime,
         usingHostedNumber,
       );
-      await apiClient.createTwilioKey(sid, authToken);
+      if (sid && authToken) {
+        await apiClient.createTwilioKey(sid, authToken);
+      }
       setSaveStatus("success");
       setTimeout(() => setSaveStatus("idle"), 2000); // hide message after 2s
     } catch (err) {
@@ -174,7 +177,7 @@ export default function HumanAsATool() {
         onClick={handleSave}
         disabled={
           !humanNumber ||
-          !agentNumber ||
+          (!agentNumber && !usingHostedNumber) ||
           (!sid && !usingHostedNumber) ||
           (!authToken && !usingHostedNumber) ||
           saveStatus === "saving"
